@@ -24,5 +24,6 @@ func NewNode(ip, nType string) *Node {
 		SendChan:    make(chan *message.Message, defaultChanSize),
 		ReceiveChan: make(chan *message.Message, defaultChanSize),
 		NodeType:    nType,
+		TopicList:   []string{},
 	}
 }

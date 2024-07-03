@@ -14,8 +14,9 @@ const dateTimeFormat = "2006-01-02 15:04:05"
 
 type Message struct {
 	ID          string    `json:"id"`
-	Src         string    `json:"src"`
-	Dst         string    `json:"dst"`
+	Dst         string    `json:"dst"`       //目的地
+	Topic       string    `json:"topic"`     //消息主题
+	Broadcast   bool      `json:"broadcast"` //是否广播
 	CreateTime  time.Time `json:"createTime"`
 	ConsumeTime time.Time `json:"consumeTime"`
 	Body        any       `json:"body"`
@@ -37,12 +38,13 @@ func (m *Message) MessageJsonUnMarshal(bytesMessage []byte) error {
 	return nil
 }
 
-func NewMessage(src, dst string, content any) *Message {
+func NewMessage(dst, topic, content string) *Message {
 	id := ""
 	return &Message{
 		ID:          id,
-		Src:         src,
 		Dst:         dst,
+		Topic:       topic,
+		Broadcast:   false,
 		CreateTime:  time.Now(),
 		ConsumeTime: time.Time{},
 		Body:        content,
