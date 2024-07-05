@@ -13,13 +13,17 @@ import (
 
 type nodeMap map[string]*node.Node
 type messageChanSlice []chan *message.Message
-type MessageMap map[string]*message.Message //全局消息map
+
+type MessageQueue struct {
+	MessageHistory map[string]*message.Message //消息历史
+	MessageChan    chan *message.Message       //消息通道，用于发送消息
+	rwm            sync.RWMutex
+}
 
 type broker struct {
-	OnlineNodes nodeMap               //所有在线节点
-	Subscribers map[string]nodeMap    //节点主题订阅关系组
-	Messages    MessageMap            //所有消息
-	MessagesMap map[string]MessageMap //消息主题关系组
+	OnlineNodes nodeMap                  //所有在线节点
+	Subscribers map[string]nodeMap       //节点主题订阅关系组
+	MQMap       map[string]*MessageQueue //主题消息队列
 	MessageChan chan *message.Message
 	rwm         sync.RWMutex
 }
@@ -28,20 +32,25 @@ type broker struct {
 func (b *broker) Distribute(msg *message.Message) {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
-	if msg.Dst != "" {
-
-	}
-	if nm, ok := b.Subscribers[msg.Topic]; ok {
-		var mChans messageChanSlice
-		for _, v := range nm {
-			mChans = append(mChans, v.SendChan)
-		}
-		//启动一个协程将消息发送到各个通道
-		go func(msg *message.Message, mcs messageChanSlice) {
-			for _, c := range mcs {
-				c <- msg
+	if msg.Broadcast {
+		//处理广播消息，分发到每个订阅节点的通道
+		if nm, ok := b.Subscribers[msg.Topic]; ok {
+			var mChans messageChanSlice
+			for _, v := range nm {
+				mChans = append(mChans, v.MQ.MessageChan)
 			}
-		}(msg, mChans)
+			//启动一个协程将消息发送到每个节点的通道
+			go func(msg *message.Message, mcs messageChanSlice) {
+				for _, c := range mcs {
+					c <- msg
+				}
+			}(msg, mChans)
+		}
+	} else {
+		//处理普通消息
+		if mq, ok := b.MQMap[msg.Topic]; ok {
+			mq.MessageChan <- msg
+		}
 	}
 }
 
