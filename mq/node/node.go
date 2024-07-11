@@ -1,8 +1,7 @@
 package node
 
 import (
-	"dominant/message"
-	"dominant/mq"
+	"dominant/mq/message"
 )
 
 //
@@ -11,23 +10,20 @@ import (
 //
 
 type Node struct {
-	Addr      string           //节点地址
-	MQ        *mq.MessageQueue //专有消息队列
-	NodeType  string           //节点类型
-	TopicList []string         //节点订阅主题列表
+	ID   string                //节点唯一标识符
+	Addr string                //节点地址
+	MQ   *message.MessageQueue //专有消息队列
+	//NodeType string                //节点类型
+	//TopicList []string              //节点订阅主题列表
 }
 
-var defaultChanSize = 100
-
-func NewNode(ip, nType string) *Node {
+func NewNode(id, ip string) *Node {
 	//id := uuid.NewV4().String()
+
 	return &Node{
+		ID:   id,
 		Addr: ip,
-		MQ: &mq.MessageQueue{
-			MessageHistory: make(map[string]*message.Message),
-			MessageChan:    make(chan *message.Message, defaultChanSize),
-		},
-		NodeType:  nType,
-		TopicList: []string{},
+		MQ:   message.NewMessageQueue(),
+		//TopicList: []string{},
 	}
 }
