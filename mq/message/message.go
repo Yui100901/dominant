@@ -21,7 +21,7 @@ type Message struct {
 	Body        any       `json:"body"`
 }
 
-func NewMessage(src string, dst []string, content string) *Message {
+func NewMessage(src string, dst []string, content any) *Message {
 	id := ""
 	return &Message{
 		ID:          id,

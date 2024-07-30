@@ -22,9 +22,9 @@ func NewNode(id, ip string) *Node {
 	//id := uuid.NewV4().String()
 
 	return &Node{
-		ID:   id,
-		Addr: ip,
-		MQ:   message.NewMessageQueue(),
-		//TopicList: []string{},
+		ID:        id,
+		Addr:      ip,
+		MQ:        message.NewMessageQueue(),
+		AliveChan: make(chan bool),
 	}
 }

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"dominant/mq/message"
 	"dominant/server"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -41,6 +43,12 @@ func init() {
 
 func main() {
 	log.Println(ID)
+	go func() {
+		for {
+			alive()
+			time.Sleep(5 * time.Second)
+		}
+	}()
 	for {
 		time.Sleep(5 * time.Second)
 		msg := getMessage()
@@ -76,8 +84,12 @@ func getMessage() *message.Message {
 }
 
 func alive() {
-	url := fmt.Sprintf("%s/alive", BaseUrl)
-	req, _ := http.NewRequest("POST", url, nil)
+	url := fmt.Sprintf("%s/register", BaseUrl)
+	data := make(map[string]string)
+	data["id"] = ID
+	bytesData, err := json.Marshal(data)
+	req, _ := http.NewRequest("POST", url, bytes.NewReader(bytesData))
+	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
 	resp, err := client.Do(req)
 	body, err := io.ReadAll(resp.Body)
 	msg := &message.Message{}
@@ -85,6 +97,7 @@ func alive() {
 	if err != nil {
 		return
 	}
+	fmt.Println(msg.Body)
 }
 
 func postFeedback(m *message.Message) {

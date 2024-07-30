@@ -47,7 +47,6 @@ func getMessage(c *gin.Context) {
 	id := c.Query("id")
 	fmt.Println(ip)
 	msg := b.GetMessage(id)
-	b.Register(id, ip)
 	c.JSON(http.StatusOK, msg)
 }
 
@@ -58,13 +57,12 @@ func getClientList(c *gin.Context) {
 
 func register(c *gin.Context) {
 	ip := c.ClientIP()
-	id := c.Query("id")
-	b.Register(id, ip)
-	b.KeepAlive(id)
-	//if _, ok := cluster.Load(id); ok {
-	//	c.JSON(http.StatusOK, gin.H{"message": "Keep Alive Success!"})
-	//} else {
-	//	cluster.Store(id, node.NewNode(id))
-	//	c.JSON(http.StatusOK, gin.H{"message": "Create Connection Success!"})
-	//}
+	body := make(map[string]any)
+	if err := c.ShouldBind(&body); err == nil {
+		//获取请求体中json数据
+		id := body["id"].(string)
+		b.Register(id, ip)
+		msg := message.NewMessage("Server", []string{id}, "Alive Success!")
+		c.JSON(http.StatusOK, msg)
+	}
 }

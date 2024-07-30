@@ -45,12 +45,22 @@ func (b *Broker) Distribute(msg *message.Message) {
 }
 
 // Register 将某个id注册为在线节点
-func (b *Broker) Register(id string, ip string) *Node {
+func (b *Broker) Register(id string, ip string) {
 	b.rwm.Lock()
 	defer b.rwm.Unlock()
-	n := NewNode(id, ip)
-	b.OnlineNodeMap[id] = n
-	return n
+	var n *Node
+	n = b.OnlineNodeMap[id]
+	if n == nil {
+		//如果id为空则向全局队列中注册
+		n = NewNode(id, ip)
+		b.OnlineNodeMap[id] = n
+		//启动保活协程
+		go b.keepAlive(id)
+	} else {
+		//如果id已经存在则向目标节点发送保活消息
+		n.AliveChan <- true
+	}
+
 }
 
 // Unregister 取消某个id的节点在线状态
@@ -60,8 +70,9 @@ func (b *Broker) Unregister(id string) {
 	delete(b.OnlineNodeMap, id)
 }
 
+// GetNodeById 根据id获取一个节点
 func (b *Broker) GetNodeById(id string) *Node {
-	b.rwm.RUnlock()
+	b.rwm.RLock()
 	defer b.rwm.RUnlock()
 	n := b.OnlineNodeMap[id]
 	return n
@@ -89,14 +100,8 @@ func (b *Broker) GetMessage(id string) *message.Message {
 	return msg
 }
 
-// SendHeartBeat 发送心跳
-func (b *Broker) SendHeartBeat(id string) {
-	n := b.GetNodeById(id)
-	n.AliveChan <- true
-}
-
 // KeepAlive 保持在线
-func (b *Broker) KeepAlive(id string) {
+func (b *Broker) keepAlive(id string) {
 	n := b.GetNodeById(id)
 	for {
 		select {
@@ -104,7 +109,7 @@ func (b *Broker) KeepAlive(id string) {
 			continue
 		case <-time.After(time.Second * 60):
 			b.Unregister(id)
-			log.Println("超时退出！")
+			log.Println(id, "超时退出！")
 			return // 超时，说明未在线
 		}
 	}
