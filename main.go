@@ -44,7 +44,7 @@ func GetCommand() {
 			fmt.Println("客户端退出")
 			break
 		case "lsc":
-			clientList := getClientList()
+			clientList, _ := getClientList()
 			fmt.Println(clientList)
 			continue
 		case "getm":
@@ -54,21 +54,25 @@ func GetCommand() {
 		case "":
 			continue
 		}
-		msg := message.NewMessage("true", []string{"test"}, line)
+		clientList, _ := getClientList()
+		msg := message.NewMessage("true", clientList, line)
 		res := newMessage(msg)
 		fmt.Println(res)
 	}
 }
 
-func getClientList() string {
+func getClientList() ([]string, error) {
 	url := fmt.Sprintf("%s/getClientList", BaseUrl)
 	req, _ := http.NewRequest("GET", url, nil)
 	resp, err := client.Do(req)
 	if err != nil {
-		return "发送请求失败!"
+		return []string{}, err
 	}
 	body, err := io.ReadAll(resp.Body)
-	return string(body)
+	msg := new(message.Message)
+	msg.MessageJsonUnMarshal(body)
+	clientList := anyToStringSlice(msg.Body)
+	return clientList, nil
 }
 
 func newMessage(msg *message.Message) string {
@@ -98,4 +102,22 @@ func getMessage() string {
 	}
 	body, err := io.ReadAll(resp.Body)
 	return string(body)
+}
+
+func anyToStringSlice(a any) []string {
+	var strSlice []string
+	if slice, ok := a.([]interface{}); ok {
+		// 创建一个string切片
+		// 将[]interface{}中的每个元素转换为string
+		strSlice = make([]string, len(slice))
+		for i, v := range slice {
+			if str, ok := v.(string); ok {
+				strSlice[i] = str
+			} else {
+				fmt.Println("元素不是string类型")
+				return nil
+			}
+		}
+	}
+	return strSlice
 }
