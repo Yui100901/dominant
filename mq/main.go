@@ -22,7 +22,7 @@ func main() {
 	r.POST("/newMessage", newMessage)
 	r.GET("/getMessage", getMessage)
 	r.GET("/getClientList", getClientList)
-	r.POST("/alive", alive)
+	r.POST("/register", register)
 	err := r.Run(fmt.Sprintf(":%s", server.Port))
 	if err != nil {
 		log.Fatal(err.Error())
@@ -47,6 +47,7 @@ func getMessage(c *gin.Context) {
 	id := c.Query("id")
 	fmt.Println(ip)
 	msg := b.GetMessage(id)
+	b.Register(id, ip)
 	c.JSON(http.StatusOK, msg)
 }
 
@@ -55,10 +56,11 @@ func getClientList(c *gin.Context) {
 	c.JSON(http.StatusOK, aliveList)
 }
 
-func alive(c *gin.Context) {
+func register(c *gin.Context) {
 	ip := c.ClientIP()
-	id := "1"
+	id := c.Query("id")
 	b.Register(id, ip)
+	b.KeepAlive(id)
 	//if _, ok := cluster.Load(id); ok {
 	//	c.JSON(http.StatusOK, gin.H{"message": "Keep Alive Success!"})
 	//} else {

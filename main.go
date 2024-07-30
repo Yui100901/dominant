@@ -54,7 +54,7 @@ func GetCommand() {
 		case "":
 			continue
 		}
-		msg := message.NewMessage(true, "test", "a", line)
+		msg := message.NewMessage("true", []string{"test"}, line)
 		res := newMessage(msg)
 		fmt.Println(res)
 	}
