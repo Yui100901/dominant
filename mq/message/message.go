@@ -13,12 +13,12 @@ import (
 const dateTimeFormat = "2006-01-02 15:04:05"
 
 type Message struct {
-	ID          string    `json:"id"`
-	Src         string    `json:"src"` //消息来源
-	DstList     []string  `json:"dst"` //消息目的地列表
-	CreateTime  time.Time `json:"createTime"`
-	ConsumeTime time.Time `json:"consumeTime"`
-	Body        any       `json:"body"`
+	ID          string   `json:"id"`
+	Src         string   `json:"src"` //消息来源
+	DstList     []string `json:"dst"` //消息目的地列表
+	CreateTime  string   `json:"createTime"`
+	ConsumeTime string   `json:"consumeTime"`
+	Body        any      `json:"body"`
 }
 
 func NewMessage(src string, dst []string, content any) *Message {
@@ -27,8 +27,8 @@ func NewMessage(src string, dst []string, content any) *Message {
 		ID:          id,
 		Src:         src,
 		DstList:     dst,
-		CreateTime:  time.Now(),
-		ConsumeTime: time.Time{},
+		CreateTime:  time.Now().Format(dateTimeFormat),
+		ConsumeTime: "",
 		Body:        content,
 	}
 }
