@@ -3,6 +3,7 @@ package node
 import (
 	"dominant/mq/message"
 	"log"
+	"math/rand"
 	"sync"
 	"time"
 )
@@ -17,9 +18,8 @@ type messageChanSlice []chan *message.Message
 
 type Broker struct {
 	//OnlineNodes nodeMap
-	OnlineNodeMap map[string]*Node          //所有在线节点
-	MQMap         map[string]*message.Queue //主题消息队列
-	MessageChan   chan *message.Message
+	OnlineNodeMap map[string]*Node //所有在线节点
+	MainMQ        *message.Queue   //全局队列
 	rwm           sync.RWMutex
 }
 
@@ -27,9 +27,29 @@ func NewBroker() *Broker {
 	return &Broker{
 		//OnlineNodes: make(nodeMap),
 		OnlineNodeMap: make(map[string]*Node),
-		MQMap:         make(map[string]*message.Queue),
+		MainMQ:        message.NewMessageQueue(),
 		rwm:           sync.RWMutex{},
 	}
+}
+
+func (b *Broker) Message() <-chan *message.Message {
+	for {
+		nodes := b.ListNodes()
+		select {
+		case msg := <-b.MainMQ.MessageChan:
+			if msg.DstList == nil {
+				//当消息目的地为空时将随机分配消息目的地
+				dst := randomStringFromSlice(nodes)
+				msg.DstList = append(msg.DstList, dst)
+			}
+			go b.Distribute(msg)
+		}
+	}
+}
+
+func randomStringFromSlice(slice []string) string {
+	rand.NewSource(time.Now().UnixNano()) // 设置随机数种子
+	return slice[rand.Intn(len(slice))]
 }
 
 // Distribute 消息分发

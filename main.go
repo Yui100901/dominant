@@ -7,6 +7,7 @@ import (
 	"dominant/server"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -18,14 +19,19 @@ var DestinationAddr string
 
 const BaseUrl = server.BaseUrl
 
+var exitChan chan bool
+
 func init() {
 	client = &http.Client{}
+	exitChan = make(chan bool)
 }
 
 func main() {
 	go GetCommand()
-	select {}
-
+	select {
+	case <-exitChan:
+		return
+	}
 }
 
 func GetCommand() {
@@ -41,9 +47,9 @@ func GetCommand() {
 		switch line {
 		case "exit":
 			//如果用户输入的是 exit就退出
-			fmt.Println("客户端退出")
-			break
-		case "lsc":
+			log.Println("客户端退出")
+			exitChan <- true
+		case "lse":
 			clientList, _ := getClientList()
 			fmt.Println(clientList)
 			continue
