@@ -2,6 +2,7 @@ package message
 
 import (
 	"sync"
+	"time"
 )
 
 //
@@ -34,6 +35,7 @@ func (mq *Queue) Enqueue(msg *Message) {
 func (mq *Queue) Dequeue() *Message {
 	select {
 	case msg := <-mq.MessageChan:
+		msg.ConsumeTime = time.Now().Format(dateTimeFormat)
 		return msg
 	default:
 		return &Message{}

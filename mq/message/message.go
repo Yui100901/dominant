@@ -10,8 +10,6 @@ import (
 // @Date 2024/6/19 21 17
 //
 
-const dateTimeFormat = "2006-01-02 15:04:05"
-
 type Message struct {
 	ID          string   `json:"id"`
 	Src         string   `json:"src"` //消息来源

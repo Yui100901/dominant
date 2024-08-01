@@ -29,9 +29,7 @@ func (c *Command) Exec() {
 	switch c.cmdLine {
 	case "download":
 	default:
-		log.Printf("Execute Command:%s", c.cmdLine)
-		//系统调用执行命令
-		//隐藏执行终端窗口
+		//系统调用执行命令，隐藏执行终端窗口
 		cmd.SysProcAttr = &syscall.SysProcAttr{
 			CmdLine:    fmt.Sprintf(`/c %s`, c.cmdLine),
 			HideWindow: true,
@@ -40,8 +38,11 @@ func (c *Command) Exec() {
 		if err != nil {
 			c.result = err.Error()
 		}
-		log.Printf("Result:%s", res)
 		c.result = string(res)
+		log.Printf(`
+Execute Command:
+%s
+Command Result:
+%s`, c.cmdLine, c.result)
 	}
-
 }
