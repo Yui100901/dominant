@@ -20,7 +20,7 @@ func NewMessage(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	b.Distribute(msg)
+	b.MainMQ.Enqueue(msg)
 	fmt.Println(msg)
 	c.JSON(http.StatusOK, gin.H{"message": "Success!"})
 }

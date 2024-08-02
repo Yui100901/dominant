@@ -11,4 +11,5 @@ var b *node.Broker
 
 func init() {
 	b = node.NewBroker()
+	go b.Message()
 }

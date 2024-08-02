@@ -60,8 +60,8 @@ func GetCommand() {
 		case "":
 			continue
 		}
-		clientList, _ := getClientList()
-		msg := message.NewMessage("true", clientList, line)
+		//clientList, _ := getClientList()
+		msg := message.NewMessage("true", nil, line)
 		res := newMessage(msg)
 		fmt.Println(res)
 	}

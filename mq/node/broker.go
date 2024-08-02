@@ -34,9 +34,9 @@ func NewBroker() *Broker {
 
 func (b *Broker) Message() <-chan *message.Message {
 	for {
-		nodes := b.ListNodes()
 		select {
 		case msg := <-b.MainMQ.MessageChan:
+			nodes := b.ListNodes()
 			if msg.DstList == nil {
 				//当消息目的地为空时将随机分配消息目的地
 				dst := randomStringFromSlice(nodes)
