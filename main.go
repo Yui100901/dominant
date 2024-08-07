@@ -77,7 +77,7 @@ func getClientList() ([]string, error) {
 	body, err := io.ReadAll(resp.Body)
 	msg := new(message.Message)
 	msg.MessageJsonUnMarshal(body)
-	clientList := anyToStringSlice(msg.Body)
+	clientList := anyToStringSlice(msg.Content)
 	return clientList, nil
 }
 

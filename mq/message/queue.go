@@ -16,8 +16,6 @@ type Queue struct {
 	rwm            sync.RWMutex
 }
 
-var defaultChanSize = 100
-
 func NewMessageQueue() *Queue {
 	return &Queue{
 		MessageHistory: make(map[string]*Message),

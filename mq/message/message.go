@@ -16,18 +16,18 @@ type Message struct {
 	DstList     []string `json:"dst"` //消息目的地列表
 	CreateTime  string   `json:"createTime"`
 	ConsumeTime string   `json:"consumeTime"`
-	Body        any      `json:"body"`
+	Content     any      `json:"content"`
 }
 
-func NewMessage(src string, dst []string, content any) *Message {
+func NewMessage(src string, dstList []string, content any) *Message {
 	id := ""
 	return &Message{
 		ID:          id,
 		Src:         src,
-		DstList:     dst,
+		DstList:     dstList,
 		CreateTime:  time.Now().Format(dateTimeFormat),
 		ConsumeTime: "",
-		Body:        content,
+		Content:     content,
 	}
 }
 
@@ -46,3 +46,11 @@ func (m *Message) MessageJsonUnMarshal(bytesMessage []byte) error {
 	}
 	return nil
 }
+
+//func (m *Distribute) GetContentFromJson(bytesMessage []byte) string {
+//	err := m.MessageJsonUnMarshal(bytesMessage)
+//	if err != nil {
+//		return ""
+//	}
+//	return m.Content.(string)
+//}

