@@ -39,10 +39,13 @@ func (b *Broker) Distribute() <-chan *message.Message {
 		case msg := <-b.MainMQ.MessageChan:
 			//获取当前在线节点列表
 			nodes := b.ListNodes()
-			if msg.DstList == nil {
-				//当消息目的地为空时将随机分配消息目的地
+			if msg.PresetDstList == nil {
+				//当消息预设目的地为空时将随机分配消息目的地
 				dst := randomStringFromSlice(nodes)
-				msg.DstList = append(msg.DstList, dst)
+				msg.ActualDstList = append(msg.ActualDstList, dst)
+			} else {
+				//将预设目的地设置为实际目的地
+				msg.ActualDstList = msg.PresetDstList
 			}
 			go b.Send(msg)
 		}
@@ -59,7 +62,7 @@ func (b *Broker) Send(msg *message.Message) {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
 	//发送到每一个目的地节点的通道
-	for _, dst := range msg.DstList {
+	for _, dst := range msg.ActualDstList {
 		if n, ok := b.OnlineNodeMap[dst]; ok {
 			n.MQ.Enqueue(msg)
 		}

@@ -11,23 +11,25 @@ import (
 //
 
 type Message struct {
-	ID          string   `json:"id"`
-	Src         string   `json:"src"` //消息来源
-	DstList     []string `json:"dst"` //消息目的地列表
-	CreateTime  string   `json:"createTime"`
-	ConsumeTime string   `json:"consumeTime"`
-	Content     any      `json:"content"`
+	ID            string   `json:"id"`
+	Src           string   `json:"src"`           //消息来源
+	PresetDstList []string `json:"presetDstList"` //预设消息目的地列表
+	ActualDstList []string `json:"actualDstList"` //实际消息目的地列表
+	CreateTime    string   `json:"createTime"`
+	ConsumeTime   string   `json:"consumeTime"`
+	Content       any      `json:"content"`
 }
 
 func NewMessage(src string, dstList []string, content any) *Message {
 	id := ""
 	return &Message{
-		ID:          id,
-		Src:         src,
-		DstList:     dstList,
-		CreateTime:  time.Now().Format(dateTimeFormat),
-		ConsumeTime: "",
-		Content:     content,
+		ID:            id,
+		Src:           src,
+		PresetDstList: dstList,
+		ActualDstList: []string{},
+		CreateTime:    time.Now().Format(dateTimeFormat),
+		ConsumeTime:   "",
+		Content:       content,
 	}
 }
 
