@@ -18,27 +18,27 @@ type messageChanSlice []chan *message.Message
 
 type Broker struct {
 	//OnlineNodes nodeMap
-	OnlineNodeMap map[string]*Node //所有在线节点
-	MainMQ        *message.Queue   //全局队列
-	rwm           sync.RWMutex
+	NodeMap map[string]*Node //所有在线节点
+	MainMQ  *message.Queue   //全局队列
+	rwm     sync.RWMutex
 }
 
 func NewBroker() *Broker {
 	return &Broker{
 		//OnlineNodes: make(nodeMap),
-		OnlineNodeMap: make(map[string]*Node),
-		MainMQ:        message.NewMessageQueue(),
-		rwm:           sync.RWMutex{},
+		NodeMap: make(map[string]*Node),
+		MainMQ:  message.NewMessageQueue(),
+		rwm:     sync.RWMutex{},
 	}
 }
 
-// Distribute 消息分发实现
+// Distribute 消息分发实现，根据预设目的地设置实际目的地并进行分发
 func (b *Broker) Distribute() <-chan *message.Message {
 	for {
 		select {
 		case msg := <-b.MainMQ.MessageChan:
 			//获取当前在线节点列表
-			nodes := b.ListNodes()
+			nodes := b.ListAliveNodes()
 			if msg.PresetDstList == nil {
 				//当消息预设目的地为空时将随机分配消息目的地
 				dst := randomStringFromSlice(nodes)
@@ -63,7 +63,7 @@ func (b *Broker) Send(msg *message.Message) {
 	defer b.rwm.RUnlock()
 	//发送到每一个目的地节点的通道
 	for _, dst := range msg.ActualDstList {
-		if n, ok := b.OnlineNodeMap[dst]; ok {
+		if n, ok := b.NodeMap[dst]; ok {
 			n.MQ.Enqueue(msg)
 		}
 	}
@@ -74,11 +74,11 @@ func (b *Broker) Register(id string, ip string) {
 	b.rwm.Lock()
 	defer b.rwm.Unlock()
 	var n *Node
-	n = b.OnlineNodeMap[id]
+	n = b.NodeMap[id]
 	if n == nil {
 		//如果id为空则向全局队列中注册
 		n = NewNode(id, ip)
-		b.OnlineNodeMap[id] = n
+		b.NodeMap[id] = n
 		//启动保活协程
 		go b.keepAlive(id)
 	} else {
@@ -92,24 +92,26 @@ func (b *Broker) Register(id string, ip string) {
 func (b *Broker) Unregister(id string) {
 	b.rwm.Lock()
 	defer b.rwm.Unlock()
-	delete(b.OnlineNodeMap, id)
+	b.NodeMap[id].IsAlive = false
 }
 
 // GetNodeById 根据id获取一个节点
 func (b *Broker) GetNodeById(id string) *Node {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
-	n := b.OnlineNodeMap[id]
+	n := b.NodeMap[id]
 	return n
 }
 
-// ListNodes 列出所有在线节点
-func (b *Broker) ListNodes() []string {
+// ListAliveNodes 列出所有在线节点
+func (b *Broker) ListAliveNodes() []string {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
 	var list []string
-	for _, n := range b.OnlineNodeMap {
-		list = append(list, n.ID)
+	for _, n := range b.NodeMap {
+		if n.IsAlive {
+			list = append(list, n.ID)
+		}
 	}
 	return list
 }
@@ -119,7 +121,7 @@ func (b *Broker) GetMessage(id string) *message.Message {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
 	msg := &message.Message{}
-	if n, ok := b.OnlineNodeMap[id]; ok {
+	if n, ok := b.NodeMap[id]; ok {
 		msg = n.MQ.Dequeue()
 	}
 	return msg
