@@ -18,11 +18,12 @@ var s *subscriber.Subscriber
 
 var callback mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	payload := msg.Payload()
-	topic := msg.Topic()
+	//topic := msg.Topic()
 	fmt.Printf("Subscriber Received message from topic: %s\n", msg.Topic())
-	var jsonMessage message.Message
-	json.Unmarshal(payload, &jsonMessage)
-	broker.GlobalBroker.Register(jsonMessage.ID, "device", topic, payload)
+	var jsonMessage *message.Message
+	json.Unmarshal(payload, jsonMessage)
+	broker.GlobalBroker.MainMQ.Enqueue(jsonMessage)
+	broker.GlobalBroker.Register(jsonMessage.ID, "device")
 }
 
 func init() {

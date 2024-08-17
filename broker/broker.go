@@ -71,13 +71,13 @@ func (b *Broker) Send(msg *message.Message) {
 }
 
 // Register 将某个id注册为在线节点
-func (b *Broker) Register(id, nodeType, topic string, message []byte) {
+func (b *Broker) Register(id, ip) {
 	b.rwm.Lock()
 	defer b.rwm.Unlock()
 	n := b.NodeMap[id]
 	if n == nil {
 		//id为空则向全局map中注册
-		n = node.NewNode(id, nodeType)
+		n = node.NewNode(id, ip)
 		b.NodeMap[id] = n
 		//启动保活协程
 		go b.keepAlive(id)
