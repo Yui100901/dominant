@@ -112,7 +112,7 @@ func getMessage() string {
 
 func anyToStringSlice(a any) []string {
 	var strSlice []string
-	if slice, ok := a.([]interface{}); ok {
+	if slice, ok := a.([]any); ok {
 		// 创建一个string切片
 		// 将[]interface{}中的每个元素转换为string
 		strSlice = make([]string, len(slice))

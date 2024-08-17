@@ -18,7 +18,7 @@ type messageChanSlice []chan *message.Message
 
 type Broker struct {
 	//OnlineNodes nodeMap
-	NodeMap map[string]*Node //所有在线节点
+	NodeMap map[string]*Node //所有节点
 	MainMQ  *message.Queue   //全局队列
 	rwm     sync.RWMutex
 }
@@ -38,7 +38,7 @@ func (b *Broker) Distribute() <-chan *message.Message {
 		select {
 		case msg := <-b.MainMQ.MessageChan:
 			//获取当前在线节点列表
-			nodes := b.ListAliveNodes()
+			nodes := b.GetAliveNodeIDList()
 			if msg.PresetDstList == nil {
 				//当消息预设目的地为空时将随机分配消息目的地
 				dst := randomStringFromSlice(nodes)
@@ -73,17 +73,23 @@ func (b *Broker) Send(msg *message.Message) {
 func (b *Broker) Register(id string, ip string) {
 	b.rwm.Lock()
 	defer b.rwm.Unlock()
-	var n *Node
-	n = b.NodeMap[id]
+	n := b.NodeMap[id]
 	if n == nil {
-		//如果id为空则向全局队列中注册
+		//id为空则向全局map中注册
 		n = NewNode(id, ip)
 		b.NodeMap[id] = n
 		//启动保活协程
 		go b.keepAlive(id)
 	} else {
-		//如果id已经存在则向目标节点发送保活消息
-		n.AliveChan <- true
+		//id已经存在
+		if n.IsAlive {
+			//该节点存活，向目标节点发送保活消息
+			n.AliveChan <- true
+		} else {
+			//该节点未存活，则使该节点重新上线
+			n.IsAlive = true
+			go b.keepAlive(id)
+		}
 	}
 
 }
@@ -103,8 +109,8 @@ func (b *Broker) GetNodeById(id string) *Node {
 	return n
 }
 
-// ListAliveNodes 列出所有在线节点
-func (b *Broker) ListAliveNodes() []string {
+// GetAliveNodeIDList 获取所有在线节点ID
+func (b *Broker) GetAliveNodeIDList() []string {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
 	var list []string
