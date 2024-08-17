@@ -1,6 +1,7 @@
 package api
 
 import (
+	"dominant/broker"
 	"dominant/mq/message"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -20,13 +21,13 @@ func NewMessage(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	b.MainMQ.Enqueue(msg)
+	broker.GlobalBroker.MainMQ.Enqueue(msg)
 	fmt.Println(msg)
 	c.JSON(http.StatusOK, gin.H{"message": "Success!"})
 }
 
 func GetClientList(c *gin.Context) {
-	aliveList, _ := b.GetAliveNodeIDList()
+	aliveList, _ := broker.GlobalBroker.GetAliveNodeIDList()
 	msg := message.NewMessage("Server", []string{}, aliveList)
 	c.JSON(http.StatusOK, msg)
 }

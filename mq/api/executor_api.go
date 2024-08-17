@@ -1,6 +1,7 @@
 package api
 
 import (
+	"dominant/base"
 	"dominant/mq/message"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ func GetMessage(c *gin.Context) {
 	ip := c.ClientIP()
 	id := c.Query("id")
 	fmt.Println(ip)
-	msg := b.GetMessage(id)
+	msg := base.b.GetMessage(id)
 	c.JSON(http.StatusOK, msg)
 }
 
@@ -26,7 +27,7 @@ func Register(c *gin.Context) {
 	if err := c.ShouldBind(&body); err == nil {
 		//获取请求体中json数据
 		id := body["id"].(string)
-		b.Register(id, ip)
+		base.b.Register(id, ip)
 		msg := message.NewMessage("Server", []string{id}, "Alive Success!")
 		c.JSON(http.StatusOK, msg)
 	}
