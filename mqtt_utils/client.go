@@ -1,8 +1,8 @@
 package mqtt_utils
 
 import (
+	"dominant/config"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"go-iot/base"
 )
 
 //
@@ -10,7 +10,7 @@ import (
 // @Date 2024/8/15 16 00
 //
 
-func NewMQTTClient(clientID string, info base.MqttConnectInfo) mqtt.Client {
+func NewMQTTClient(clientID string, info config.MqttConnectInfo) mqtt.Client {
 	opts := mqtt.NewClientOptions()
 	opts.SetClientID(clientID)
 	opts.AddBroker(info.MqttUrl)

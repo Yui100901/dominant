@@ -17,5 +17,5 @@ func init() {
 
 	GlobalRedisConnectInfoBase.RedisUrl = "192.168.1.200:6379"
 	GlobalRedisConnectInfoBase.Username = ""
-	GlobalRedisConnectInfoBase.Password = "rediszmkj123456"
+	GlobalRedisConnectInfoBase.Password = "123456"
 }

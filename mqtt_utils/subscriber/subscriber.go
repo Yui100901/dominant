@@ -1,9 +1,9 @@
 package subscriber
 
 import (
+	"dominant/config"
+	"dominant/mqtt_utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"go-iot/base"
-	"go-iot/mqtt_utils"
 )
 
 //
@@ -19,7 +19,7 @@ type Subscriber struct {
 
 func NewSubscriber(clientID string, topicMap map[string]byte, callback mqtt.MessageHandler) *Subscriber {
 	return &Subscriber{
-		client:   mqtt_utils.NewMQTTClient(clientID, base.GlobalMqttConnectInfoBase),
+		client:   mqtt_utils.NewMQTTClient(clientID, config.GlobalMqttConnectInfoBase),
 		topicMap: topicMap,
 		callback: callback,
 	}
