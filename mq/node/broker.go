@@ -38,7 +38,7 @@ func (b *Broker) Distribute() <-chan *message.Message {
 		select {
 		case msg := <-b.MainMQ.MessageChan:
 			//获取当前在线节点列表
-			nodes := b.GetAliveNodeIDList()
+			nodes, _ := b.GetAliveNodeIDList()
 			if msg.PresetDstList == nil {
 				//当消息预设目的地为空时将随机分配消息目的地
 				dst := randomStringFromSlice(nodes)
@@ -70,13 +70,13 @@ func (b *Broker) Send(msg *message.Message) {
 }
 
 // Register 将某个id注册为在线节点
-func (b *Broker) Register(id string, ip string) {
+func (b *Broker) Register(id, nodeType, topic string, message []byte) {
 	b.rwm.Lock()
 	defer b.rwm.Unlock()
 	n := b.NodeMap[id]
 	if n == nil {
 		//id为空则向全局map中注册
-		n = NewNode(id, ip)
+		n = NewNode(id, nodeType)
 		b.NodeMap[id] = n
 		//启动保活协程
 		go b.keepAlive(id)
@@ -109,17 +109,19 @@ func (b *Broker) GetNodeById(id string) *Node {
 	return n
 }
 
-// GetAliveNodeIDList 获取所有在线节点ID
-func (b *Broker) GetAliveNodeIDList() []string {
+// GetAliveNodeIDList 获取所有在线节点ID和节点详细信息
+func (b *Broker) GetAliveNodeIDList() ([]string, []*Node) {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
-	var list []string
-	for _, n := range b.NodeMap {
-		if n.IsAlive {
-			list = append(list, n.ID)
+	var onlineNodeIdList []string
+	var onlineNodeList []*Node
+	for id, node := range b.NodeMap {
+		if node.IsAlive {
+			onlineNodeIdList = append(onlineNodeIdList, id)
+			onlineNodeList = append(onlineNodeList, node)
 		}
 	}
-	return list
+	return onlineNodeIdList, onlineNodeList
 }
 
 // GetMessage 根据id定位一则消息
