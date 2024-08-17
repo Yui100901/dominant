@@ -26,7 +26,7 @@ func NewMessage(c *gin.Context) {
 }
 
 func GetClientList(c *gin.Context) {
-	aliveList := b.ListAliveNodes()
+	aliveList := b.GetAliveNodeIDList()
 	msg := message.NewMessage("Server", []string{}, aliveList)
 	c.JSON(http.StatusOK, msg)
 }

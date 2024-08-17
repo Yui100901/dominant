@@ -25,6 +25,7 @@ func NewNode(id, ip string) *Node {
 		ID:        id,
 		Addr:      ip,
 		MQ:        message.NewMessageQueue(),
+		IsAlive:   true, //节点创建时默认存活状态
 		AliveChan: make(chan bool),
 	}
 }
