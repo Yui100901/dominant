@@ -19,7 +19,7 @@ type Subscriber struct {
 
 func NewSubscriber(clientID string, topicMap map[string]byte, callback mqtt.MessageHandler) *Subscriber {
 	return &Subscriber{
-		client:   mqttutil.NewMQTTClient(clientID, config.GlobalMqttConnectInfoBase),
+		client:   mqttutil.NewMQTTClient(clientID, config.GlobalMqttConnectInfo),
 		topicMap: topicMap,
 		callback: callback,
 	}

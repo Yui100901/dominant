@@ -1,8 +1,11 @@
 package broker
 
 import (
+	"context"
 	"dominant/mq/message"
 	"dominant/mq/node"
+	"dominant/redis_utils"
+
 	"log"
 	"math/rand"
 	"sync"
@@ -70,11 +73,18 @@ func randomStringFromSlice(slice []string) string {
 func (b *Broker) Send(msg *message.Message) {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
-
-	//发送到每一个目的地节点的通道
-	for _, dst := range msg.ActualDstList {
-		if n, ok := b.NodeMap[dst]; ok {
-			n.MQ.Enqueue(msg)
+	if msg.Type == "status" {
+		//状态消息更新redis
+		//更新redis
+		ctx := context.Background()
+		redis_utils.GlobalRedisClient.Set(ctx, msg.ID, msg, 60*time.Second)
+	}
+	if msg.Type == "command" {
+		//发送到每一个目的地节点的通道
+		for _, dst := range msg.ActualDstList {
+			if n, ok := b.NodeMap[dst]; ok {
+				n.MQ.Enqueue(msg)
+			}
 		}
 	}
 }

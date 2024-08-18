@@ -5,7 +5,7 @@ package config
 // @Date 2024/8/17 13 43
 //
 
-var GlobalMqttConnectInfoBase MqttConnectInfo
+var GlobalMqttConnectInfo MqttConnectInfo
 
 type MqttConnectInfo struct {
 	MqttUrl  string
@@ -14,7 +14,7 @@ type MqttConnectInfo struct {
 }
 
 func init() {
-	GlobalMqttConnectInfoBase.MqttUrl = "tcp://192.168.1.200:11883"
-	GlobalMqttConnectInfoBase.Username = "root"
-	GlobalMqttConnectInfoBase.Password = "123456"
+	GlobalMqttConnectInfo.MqttUrl = "tcp://192.168.1.200:11883"
+	GlobalMqttConnectInfo.Username = "root"
+	GlobalMqttConnectInfo.Password = "123456"
 }

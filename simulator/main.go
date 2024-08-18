@@ -31,7 +31,7 @@ func main() {
 		go func() {
 			for {
 				//for i := 0; i < 100; i++ {
-				client := mqttutils.NewMQTTClient(id, config.GlobalMqttConnectInfoBase)
+				client := mqttutils.NewMQTTClient(id, config.GlobalMqttConnectInfo)
 				publisher.PublishTelemetry(client, topic, jsonMessage)
 				time.Sleep(500 * time.Millisecond)
 			}
