@@ -23,7 +23,7 @@ var callback mqtt.MessageHandler = func(client mqtt.Client, mqttMsg mqtt.Message
 	log.Printf("Subscriber Received message from topic: %s\n", mqttMsg.Topic())
 	var mqttMessage *mqtt_utils.MqttMessage
 	json.Unmarshal(payload, mqttMessage)
-	msg := message.NewMessage(mqttMessage.ID, []string{topic}, mqttMessage)
+	msg := message.NewMessage(topic, "", mqttMessage.ID, []string{topic}, mqttMessage)
 	broker.GlobalBroker.MainMQ.Enqueue(msg)
 	broker.GlobalBroker.Register(msg.ID, "device")
 }

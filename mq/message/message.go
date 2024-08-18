@@ -12,6 +12,8 @@ import (
 
 type Message struct {
 	ID            string   `json:"id"`
+	Topic         string   `json:"topic"`
+	Type          string   `json:"type"`
 	Src           string   `json:"src"`           //消息来源
 	PresetDstList []string `json:"presetDstList"` //预设消息目的地列表
 	ActualDstList []string `json:"actualDstList"` //实际消息目的地列表
@@ -20,10 +22,12 @@ type Message struct {
 	Content       any      `json:"content"`
 }
 
-func NewMessage(src string, dstList []string, content any) *Message {
+func NewMessage(topic, messageType, src string, dstList []string, content any) *Message {
 	id := ""
 	return &Message{
 		ID:            id,
+		Topic:         topic,
+		Type:          messageType,
 		Src:           src,
 		PresetDstList: dstList,
 		ActualDstList: []string{},

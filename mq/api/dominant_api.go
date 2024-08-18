@@ -28,6 +28,6 @@ func NewMessage(c *gin.Context) {
 
 func GetClientList(c *gin.Context) {
 	aliveList, _ := broker.GlobalBroker.GetAliveNodeIDList()
-	msg := message.NewMessage("Server", []string{}, aliveList)
+	msg := message.NewMessage("", "", "Server", []string{}, aliveList)
 	c.JSON(http.StatusOK, msg)
 }

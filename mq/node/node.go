@@ -16,7 +16,7 @@ type Node struct {
 	IsAlive   bool           //存活标记
 	AliveChan chan bool      //心跳通道
 	//NodeType string                //节点类型
-	//TopicList []string              //节点订阅主题列表
+	TopicMap map[string]string //节点订阅主题表
 }
 
 func NewNode(id, ip string) *Node {
@@ -27,5 +27,6 @@ func NewNode(id, ip string) *Node {
 		MQ:        message.NewMessageQueue(),
 		IsAlive:   true, //节点创建时默认存活状态
 		AliveChan: make(chan bool),
+		TopicMap:  make(map[string]string),
 	}
 }

@@ -28,7 +28,7 @@ func Register(c *gin.Context) {
 		//获取请求体中json数据
 		id := body["id"].(string)
 		broker.GlobalBroker.Register(id, ip)
-		msg := message.NewMessage("Server", []string{id}, "Alive Success!")
+		msg := message.NewMessage("", "", "Server", []string{id}, "Alive Success!")
 		c.JSON(http.StatusOK, msg)
 	}
 }

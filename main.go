@@ -61,7 +61,7 @@ func GetCommand() {
 			continue
 		}
 		//clientList, _ := getClientList()
-		msg := message.NewMessage("true", nil, line)
+		msg := message.NewMessage("", "", "true", nil, line)
 		res := newMessage(msg)
 		fmt.Println(res)
 	}
