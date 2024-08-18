@@ -1,7 +1,6 @@
 package message
 
 import (
-	"encoding/json"
 	"time"
 )
 
@@ -35,22 +34,6 @@ func NewMessage(topic, messageType, src string, dstList []string, content any) *
 		ConsumeTime:   "",
 		Content:       content,
 	}
-}
-
-func (m *Message) MessageJsonMarshal() ([]byte, error) {
-	bytesMessage, err := json.Marshal(*m)
-	if err != nil {
-		return nil, err
-	}
-	return bytesMessage, nil
-}
-
-func (m *Message) MessageJsonUnMarshal(bytesMessage []byte) error {
-	err := json.Unmarshal(bytesMessage, m)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // AddPresetDestination 增加预设目的地

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"dominant/mq/message"
 	"dominant/server"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -61,7 +62,7 @@ func GetCommand() {
 			continue
 		}
 		//clientList, _ := getClientList()
-		msg := message.NewMessage("", "", "true", nil, line)
+		msg := message.NewMessage("", "command", "true", nil, line)
 		res := newMessage(msg)
 		fmt.Println(res)
 	}
@@ -75,15 +76,18 @@ func getClientList() ([]string, error) {
 		return []string{}, err
 	}
 	body, err := io.ReadAll(resp.Body)
-	msg := new(message.Message)
-	msg.MessageJsonUnMarshal(body)
+	msg := &message.Message{}
+	err = json.Unmarshal(body, msg)
+	if err != nil {
+		return []string{}, err
+	}
 	clientList := anyToStringSlice(msg.Content)
 	return clientList, nil
 }
 
 func newMessage(msg *message.Message) string {
 	url := fmt.Sprintf("%s/newMessage", BaseUrl)
-	bytesMessage, err := msg.MessageJsonMarshal()
+	bytesMessage, err := json.Marshal(*msg)
 	if err != nil {
 		fmt.Println("json序列化失败:", err.Error())
 		return ""

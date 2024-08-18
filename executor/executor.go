@@ -68,7 +68,7 @@ func getMessage() *message.Message {
 	}
 	body, err := io.ReadAll(resp.Body)
 	msg := &message.Message{}
-	err = msg.MessageJsonUnMarshal(body)
+	err = json.Unmarshal(body, msg)
 	if err != nil {
 		return nil
 	}
@@ -89,7 +89,7 @@ func alive() {
 	resp, err := client.Do(req)
 	body, err := io.ReadAll(resp.Body)
 	msg := &message.Message{}
-	err = msg.MessageJsonUnMarshal(body)
+	err = json.Unmarshal(body, msg)
 	if err != nil {
 		return
 	}

@@ -3,6 +3,7 @@ package api
 import (
 	"dominant/broker"
 	"dominant/mq/message"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -17,7 +18,7 @@ import (
 func NewMessage(c *gin.Context) {
 	body, _ := io.ReadAll(c.Request.Body)
 	msg := &message.Message{}
-	err := msg.MessageJsonUnMarshal(body)
+	err := json.Unmarshal(body, msg)
 	if err != nil {
 		return
 	}
