@@ -71,7 +71,7 @@ func (b *Broker) Send(msg *message.Message) {
 }
 
 // Register 将某个id注册为在线节点
-func (b *Broker) Register(id, ip) {
+func (b *Broker) Register(id, ip string) {
 	b.rwm.Lock()
 	defer b.rwm.Unlock()
 	n := b.NodeMap[id]

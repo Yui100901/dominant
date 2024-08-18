@@ -49,6 +49,11 @@ func (m *Message) MessageJsonUnMarshal(bytesMessage []byte) error {
 	return nil
 }
 
+// AddPresetDestination 增加预设目的地
+func (m *Message) AddPresetDestination(dst string) {
+	m.PresetDstList = append(m.PresetDstList, dst)
+}
+
 //func (m *Distribute) GetContentFromJson(bytesMessage []byte) string {
 //	err := m.MessageJsonUnMarshal(bytesMessage)
 //	if err != nil {
