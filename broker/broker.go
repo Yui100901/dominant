@@ -5,6 +5,7 @@ import (
 	"dominant/mq/message"
 	"dominant/mq/node"
 	"dominant/redis_utils"
+	"fmt"
 
 	"log"
 	"math/rand"
@@ -141,6 +142,18 @@ func (b *Broker) GetAliveNodeIDList() ([]string, []node.Node) {
 		}
 	}
 	return onlineNodeIdList, onlineNodeList
+}
+
+// GetAliveNodeMessage 获取所有节点最新状态消息
+func (b *Broker) GetAliveNodeMessage() []any {
+	idList, _ := b.GetAliveNodeIDList()
+	fmt.Println("Online Node List:", idList)
+	ctx := context.Background()
+	messageList, err := redis_utils.GlobalRedisClient.MGet(ctx, idList...).Result()
+	if err != nil {
+		fmt.Println("Get Alive Node Message Error:", err)
+	}
+	return messageList
 }
 
 // GetMessage 根据id定位一则消息

@@ -7,7 +7,9 @@ import (
 	"dominant/mqttutil/subscriber"
 	"encoding/json"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/gin-gonic/gin"
 	"log"
+	"net/http"
 )
 
 //
@@ -35,4 +37,9 @@ func init() {
 		},
 		callback)
 	go s.Subscribe()
+}
+
+func GetNodeStatusList(c *gin.Context) {
+	msgList := broker.GlobalBroker.GetAliveNodeMessage()
+	c.JSON(http.StatusOK, msgList)
 }
