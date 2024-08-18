@@ -3,7 +3,7 @@ package api
 import (
 	"dominant/broker"
 	"dominant/mq/message"
-	"dominant/mqtt_utils/subscriber"
+	"dominant/mqttutil/subscriber"
 	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -16,14 +16,15 @@ import (
 
 var s *subscriber.Subscriber
 
-var callback mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	payload := msg.Payload()
-	//topic := msg.Topic()
-	fmt.Printf("Subscriber Received message from topic: %s\n", msg.Topic())
+var callback mqtt.MessageHandler = func(client mqtt.Client, mqttMsg mqtt.Message) {
+	payload := mqttMsg.Payload()
+	topic := mqttMsg.Topic()
+	fmt.Printf("Subscriber Received message from topic: %s\n", mqttMsg.Topic())
 	var jsonMessage *message.Message
 	json.Unmarshal(payload, jsonMessage)
-	broker.GlobalBroker.MainMQ.Enqueue(jsonMessage)
-	broker.GlobalBroker.Register(jsonMessage.ID, "device")
+	msg := message.NewMessage(jsonMessage.ID, []string{topic}, jsonMessage)
+	broker.GlobalBroker.MainMQ.Enqueue(msg)
+	broker.GlobalBroker.Register(msg.ID, "device")
 }
 
 func init() {
