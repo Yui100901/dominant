@@ -2,7 +2,7 @@ package main
 
 import (
 	"dominant/config"
-	mqtt_utils "dominant/mqttutil"
+	mqttutils "dominant/mqttutil"
 	"dominant/mqttutil/publisher"
 	"encoding/json"
 	"fmt"
@@ -22,7 +22,7 @@ func main() {
 		idMap[strconv.Itoa(i)] = fmt.Sprintf(`SHIP2APP/%d/BASIC`, i)
 	}
 	for id, topic := range idMap {
-		msg := &mqtt_utils.MqttMessage{
+		msg := &mqttutils.MqttMessage{
 			ID:        "jdaidj",
 			NodeId:    "123456",
 			Telemetry: `{"message":"hello world"}`,
@@ -31,7 +31,7 @@ func main() {
 		go func() {
 			for {
 				//for i := 0; i < 100; i++ {
-				client := mqtt_utils.NewMQTTClient(id, config.GlobalMqttConnectInfoBase)
+				client := mqttutils.NewMQTTClient(id, config.GlobalMqttConnectInfoBase)
 				publisher.PublishTelemetry(client, topic, jsonMessage)
 				time.Sleep(500 * time.Millisecond)
 			}

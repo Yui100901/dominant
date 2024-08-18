@@ -3,7 +3,7 @@ package api
 import (
 	"dominant/broker"
 	"dominant/mq/message"
-	mqtt_utils "dominant/mqttutil"
+	mqttutils "dominant/mqttutil"
 	"dominant/mqttutil/subscriber"
 	"encoding/json"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -21,7 +21,7 @@ var callback mqtt.MessageHandler = func(client mqtt.Client, mqttMsg mqtt.Message
 	payload := mqttMsg.Payload()
 	topic := mqttMsg.Topic()
 	log.Printf("Subscriber Received message from topic: %s\n", mqttMsg.Topic())
-	var mqttMessage *mqtt_utils.MqttMessage
+	var mqttMessage *mqttutils.MqttMessage
 	json.Unmarshal(payload, mqttMessage)
 	msg := message.NewMessage(topic, "", mqttMessage.ID, []string{topic}, mqttMessage)
 	broker.GlobalBroker.MainMQ.Enqueue(msg)
