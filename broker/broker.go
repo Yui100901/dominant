@@ -92,7 +92,6 @@ func (b *Broker) Register(id, ip string) {
 			go b.keepAlive(id)
 		}
 	}
-
 }
 
 // Unregister 取消某个id的节点在线状态

@@ -19,7 +19,7 @@ var DestinationAddr string
 
 const BaseUrl = server.BaseUrl
 
-var exitChan chan bool
+var exitChan chan bool //退出通道
 
 func init() {
 	client = &http.Client{}

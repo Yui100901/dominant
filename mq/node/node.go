@@ -10,7 +10,7 @@ import (
 //
 
 type Node struct {
-	ID        string         //节点唯一标识符
+	ID        string
 	Addr      string         //节点地址
 	MQ        *message.Queue //专有消息队列
 	IsAlive   bool           //存活标记
