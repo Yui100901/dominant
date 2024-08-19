@@ -43,5 +43,12 @@ func init() {
 
 func GetNodeStatusList(c *gin.Context) {
 	msgList := broker.GlobalBroker.GetAliveNodeMessage()
+	var mqttMessageList []*mqttutils.MqttMessage
+	for _, msg := range msgList {
+		stringMessage := msg.(string)
+		mqttMessage := new(mqttutils.MqttMessage)
+		json.Unmarshal([]byte(stringMessage), mqttMessage)
+		mqttMessageList = append(mqttMessageList, mqttMessage)
+	}
 	c.JSON(http.StatusOK, msgList)
 }
