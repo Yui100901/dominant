@@ -22,12 +22,12 @@ func GetMessage(c *gin.Context) {
 }
 
 func Register(c *gin.Context) {
-	ip := c.ClientIP()
+	ipAddr := c.ClientIP()
 	body := make(map[string]any)
 	if err := c.ShouldBind(&body); err == nil {
 		//获取请求体中json数据
 		id := body["id"].(string)
-		broker.GlobalBroker.Register(id, ip)
+		broker.GlobalBroker.Register(id, ipAddr, []byte(""))
 		msg := message.NewMessage("", "", "Server", []string{id}, "Alive Success!")
 		c.JSON(http.StatusOK, msg)
 	}

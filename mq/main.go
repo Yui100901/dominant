@@ -12,6 +12,7 @@ func main() {
 	r := server.NewServer()
 	r.POST("/newMessage", api.NewMessage)
 	r.GET("/getClientList", api.GetClientList)
+	//获取节点状态
 	r.GET("/getNodeStatusList", api2.GetNodeStatusList)
 	//执行器相关接口
 	r.GET("/getMessage", api.GetMessage)

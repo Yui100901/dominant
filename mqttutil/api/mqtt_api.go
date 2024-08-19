@@ -23,17 +23,19 @@ var callback mqtt.MessageHandler = func(client mqtt.Client, mqttMsg mqtt.Message
 	payload := mqttMsg.Payload()
 	topic := mqttMsg.Topic()
 	log.Printf("Subscriber Received message from topic: %s\n", mqttMsg.Topic())
-	var mqttMessage *mqttutils.MqttMessage
-	json.Unmarshal(payload, mqttMessage)
-	msg := message.NewMessage(topic, "", mqttMessage.ID, []string{topic}, mqttMessage)
-	broker.GlobalBroker.MainMQ.Enqueue(msg)
-	broker.GlobalBroker.Register(msg.ID, "device")
+	mqttMessage := new(mqttutils.MqttMessage)
+	err := json.Unmarshal(payload, mqttMessage)
+	if err != nil {
+		log.Fatal(err)
+	}
+	msg := message.NewMessage(topic, "status", mqttMessage.NodeId, []string{topic}, mqttMessage)
+	broker.GlobalBroker.Register(mqttMessage.NodeId, msg.Topic, payload)
 }
 
 func init() {
 	s = subscriber.NewSubscriber("mqtt_subscriber",
 		map[string]byte{
-			"SHIP2APP/+/BASIC": 0,
+			"TEST/+": 0,
 		},
 		callback)
 	go s.Subscribe()
