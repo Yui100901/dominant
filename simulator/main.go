@@ -16,15 +16,14 @@ import (
 //
 
 func main() {
-
 	idMap := make(map[string]string)
 	for i := 0; i < 10; i++ {
-		idMap[strconv.Itoa(i)] = fmt.Sprintf(`SHIP2APP/%d/BASIC`, i)
+		idMap[strconv.Itoa(i)] = fmt.Sprintf(`TEST/%d`, i)
 	}
 	for id, topic := range idMap {
 		msg := &mqttutils.MqttMessage{
-			ID:        "jdaidj",
-			NodeId:    "123456",
+			ID:        id,
+			NodeId:    id,
 			Telemetry: `{"message":"hello world"}`,
 		}
 		jsonMessage, _ := json.Marshal(msg)
