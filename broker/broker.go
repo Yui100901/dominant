@@ -6,7 +6,6 @@ import (
 	"dominant/mq/node"
 	"dominant/redis_utils"
 	"fmt"
-
 	"log"
 	"math/rand"
 	"sync"
@@ -24,7 +23,7 @@ type messageChanSlice []chan *message.Message
 type Broker struct {
 	//OnlineNodes nodeMap
 	NodeMap map[string]*node.Node //所有节点
-	MainMQ  *message.Queue        //全局队列
+	MainMQ  *message.Queue        //全局主队列
 	rwm     sync.RWMutex
 }
 
@@ -60,6 +59,7 @@ func (b *Broker) Distribute() <-chan *message.Message {
 				dst := randomStringFromSlice(nodeIDs)
 				msg.ActualDstList = append(msg.ActualDstList, dst)
 			}
+			log.Println("Distribute:", msg.ActualDstList)
 			go b.Send(msg)
 		}
 	}
@@ -70,16 +70,10 @@ func randomStringFromSlice(slice []string) string {
 	return slice[rand.Intn(len(slice))]
 }
 
-// Send 消息分发
+// Send 消息发送
 func (b *Broker) Send(msg *message.Message) {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
-	if msg.Type == "status" {
-		//状态消息更新redis
-		//更新redis
-		ctx := context.Background()
-		redis_utils.GlobalRedisClient.Set(ctx, msg.ID, msg, 60*time.Second)
-	}
 	if msg.Type == "command" {
 		//发送到每一个目的地节点的通道
 		for _, dst := range msg.ActualDstList {
@@ -91,13 +85,13 @@ func (b *Broker) Send(msg *message.Message) {
 }
 
 // Register 将某个id注册为在线节点
-func (b *Broker) Register(id, ip string) {
+func (b *Broker) Register(id, addr string, state []byte) {
 	b.rwm.Lock()
 	defer b.rwm.Unlock()
 	n := b.NodeMap[id]
 	if n == nil {
 		//id为空则向全局map中注册
-		n = node.NewNode(id, ip)
+		n = node.NewNode(id, addr)
 		b.NodeMap[id] = n
 		//启动保活协程
 		go b.keepAlive(id)
@@ -112,6 +106,8 @@ func (b *Broker) Register(id, ip string) {
 			go b.keepAlive(id)
 		}
 	}
+	ctx := context.Background()
+	redis_utils.GlobalRedisClient.Set(ctx, n.ID, state, 60*time.Second)
 }
 
 // Unregister 取消某个id的节点在线状态
