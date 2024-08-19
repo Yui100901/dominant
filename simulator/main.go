@@ -6,6 +6,7 @@ import (
 	"dominant/mqttutil/publisher"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"strconv"
 	"time"
 )
@@ -23,7 +24,7 @@ func main() {
 	for id, topic := range idMap {
 		go func() {
 			for {
-				body := time.Now().Format("2006-01-02 15:04:05")
+				body := fmt.Sprintf("%s%s", time.Now().Format("2006-01-02 15:04:05"), uuid.New())
 				msg := &mqttutils.MqttMessage{
 					ID:        id,
 					NodeId:    id,
