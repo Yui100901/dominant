@@ -21,14 +21,15 @@ func main() {
 		idMap[strconv.Itoa(i)] = fmt.Sprintf(`TEST/%d`, i)
 	}
 	for id, topic := range idMap {
-		msg := &mqttutils.MqttMessage{
-			ID:        id,
-			NodeId:    id,
-			Telemetry: `{"message":"hello world"}`,
-		}
-		jsonMessage, _ := json.Marshal(msg)
 		go func() {
 			for {
+				body := time.Now().Format("2006-01-02 15:04:05")
+				msg := &mqttutils.MqttMessage{
+					ID:        id,
+					NodeId:    id,
+					Telemetry: fmt.Sprintf(`{"message":"%s"}`, body),
+				}
+				jsonMessage, _ := json.Marshal(msg)
 				//for i := 0; i < 100; i++ {
 				client := mqttutils.NewMQTTClient(id, config.GlobalMqttConnectInfo)
 				publisher.PublishTelemetry(client, topic, jsonMessage)
