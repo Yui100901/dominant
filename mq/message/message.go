@@ -1,6 +1,8 @@
 package message
 
 import (
+	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -13,7 +15,7 @@ type Message struct {
 	ID            string   `json:"id"`
 	Topic         string   `json:"topic"`
 	Type          string   `json:"type"`
-	Src           string   `json:"src"`           //消息来源
+	Src           string   `json:"src"`           //消息来源,某个节点的id
 	PresetDstList []string `json:"presetDstList"` //预设消息目的地列表
 	ActualDstList []string `json:"actualDstList"` //实际消息目的地列表
 	CreateTime    string   `json:"createTime"`
@@ -22,7 +24,7 @@ type Message struct {
 }
 
 func NewMessage(topic, messageType, src string, dstList []string, content any) *Message {
-	id := ""
+	id := strconv.FormatInt(rand.New(rand.NewSource(time.Now().UnixNano())).Int63(), 10)
 	return &Message{
 		ID:            id,
 		Topic:         topic,
