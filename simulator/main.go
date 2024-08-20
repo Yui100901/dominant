@@ -18,7 +18,7 @@ import (
 
 func main() {
 	idMap := make(map[string]string)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 5; i++ {
 		idMap[strconv.Itoa(i)] = fmt.Sprintf(`TEST/%d`, i)
 	}
 	for id, topic := range idMap {
@@ -34,7 +34,7 @@ func main() {
 				//for i := 0; i < 100; i++ {
 				client := mqttutils.NewMQTTClient(id, config.GlobalMqttConnectInfo)
 				publisher.PublishTelemetry(client, topic, jsonMessage)
-				time.Sleep(500 * time.Millisecond)
+				time.Sleep(1000 * time.Millisecond)
 			}
 		}()
 	}

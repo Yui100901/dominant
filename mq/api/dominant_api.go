@@ -3,6 +3,7 @@ package api
 import (
 	"dominant/broker"
 	"dominant/mq/message"
+	"dominant/server"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -31,4 +32,14 @@ func GetClientList(c *gin.Context) {
 	aliveList, _ := broker.GlobalBroker.GetAliveNodeIDList()
 	msg := message.NewMessage("", "", "Server", []string{}, aliveList)
 	c.JSON(http.StatusOK, msg)
+}
+
+func ServeWebSocket(w http.ResponseWriter, r *http.Request) {
+	ws := server.NewWebSocket(w, r)
+	defer ws.Close()
+
+	go ws.OnMessage(nil)
+	go ws.PushMessage(broker.GlobalBroker.GetAliveNodeMessage)
+
+	<-ws.Done
 }
