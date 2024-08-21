@@ -2,8 +2,10 @@ package subscriber
 
 import (
 	"dominant/config"
-	"dominant/mqttutil"
+	mqttutils "dominant/mqttutil"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"log"
 )
 
 //
@@ -12,17 +14,33 @@ import (
 //
 
 type Subscriber struct {
+	clientId string
 	client   mqtt.Client
 	topicMap map[string]byte
 	callback mqtt.MessageHandler
 }
 
-func NewSubscriber(clientID string, topicMap map[string]byte, callback mqtt.MessageHandler) *Subscriber {
-	return &Subscriber{
-		client:   mqttutil.NewMQTTClient(clientID, config.GlobalMqttConnectInfo),
+func NewSubscriber(id string, topicMap map[string]byte, callback mqtt.MessageHandler) *Subscriber {
+	s := &Subscriber{
+		clientId: id,
 		topicMap: topicMap,
 		callback: callback,
 	}
+	opts := mqtt.NewClientOptions()
+	opts.SetClientID(id)
+	//设置断开连接时自动重新连接
+	//opts.SetAutoReconnect(true)
+	opts.SetOnConnectHandler(func(client mqtt.Client) {
+		fmt.Println("Connected")
+		go s.Subscribe()
+	})
+	opts.SetConnectionLostHandler(ConnectionLostHandler)
+	client := mqttutils.NewMQTTClient(s.clientId, config.GlobalMqttConnectInfo, opts)
+	if conn := client.Connect(); conn.Wait() && conn.Error() != nil {
+		log.Println(conn.Error())
+		return nil
+	}
+	return s
 }
 
 func (s *Subscriber) Subscribe() {
@@ -31,4 +49,10 @@ func (s *Subscriber) Subscribe() {
 	}
 	res := s.client.SubscribeMultiple(s.topicMap, s.callback)
 	res.Wait()
+}
+
+func ConnectionLostHandler(client mqtt.Client, err error) {
+	if conn := client.Connect(); conn.Wait() && conn.Error() != nil {
+		log.Println(conn.Error())
+	}
 }
