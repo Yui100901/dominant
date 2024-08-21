@@ -15,9 +15,19 @@ type Programmer struct {
 	language string
 }
 
+func Add(a, b int64) int64 {
+	return a + b
+}
+
+func Sub(a, b int64) int64 {
+	return a - b
+}
+
 func main() {
 	p := &Programmer{"abc", "go"}
-	fmt.Printf("%p", p)
+	p1 := Programmer{"134", "c"}
+	fmt.Printf("%p\n", Add)
+	fmt.Printf("%p\n", Sub)
 
 	name := (*string)(unsafe.Pointer(p))
 	*name = "def"
@@ -26,4 +36,5 @@ func main() {
 	*lang = "Golang"
 	//
 	fmt.Println(p)
+	fmt.Println(p1)
 }

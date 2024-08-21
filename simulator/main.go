@@ -1,7 +1,6 @@
 package main
 
 import (
-	"dominant/config"
 	mqttutils "dominant/mqttutil"
 	"dominant/mqttutil/publisher"
 	"encoding/json"
@@ -21,7 +20,7 @@ func main() {
 	for i := 0; i < 10; i++ {
 		idMap[strconv.Itoa(i)] = fmt.Sprintf(`TEST/%d`, i)
 	}
-	client := mqttutils.NewMQTTClient("client-id", config.GlobalMqttConnectInfo)
+	p := publisher.NewPublisher("client-id")
 	for id, topic := range idMap {
 		go func() {
 			for {
@@ -34,7 +33,7 @@ func main() {
 				jsonMessage, _ := json.Marshal(msg)
 				//for i := 0; i < 100; i++ {
 				//client := mqttutils.NewMQTTClient(id, config.GlobalMqttConnectInfo)
-				publisher.PublishTelemetry(client, topic, jsonMessage)
+				p.Publish(topic, jsonMessage)
 				time.Sleep(100 * time.Millisecond)
 			}
 		}()

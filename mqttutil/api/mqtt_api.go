@@ -39,7 +39,6 @@ func init() {
 			"TEST/+": 0,
 		},
 		callback)
-	go s.Subscribe()
 }
 
 func GetNodeStatusList(c *gin.Context) {

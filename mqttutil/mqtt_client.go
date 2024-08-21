@@ -3,6 +3,7 @@ package mqttutil
 import (
 	"dominant/config"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"log"
 )
 
 //
@@ -10,18 +11,25 @@ import (
 // @Date 2024/8/15 16 00
 //
 
-func NewMQTTClient(clientID string, info config.MqttConnectInfo) mqtt.Client {
-	opts := mqtt.NewClientOptions()
+type MQTTHandler interface {
+	OnConnectHandler(client mqtt.Client)
+	ConnectionLostHandler(client mqtt.Client, err error)
+}
+
+type MQTTClient struct {
+	ClientId string
+	client   mqtt.Client
+}
+
+func NewMQTTClient(clientID string, info config.MqttConnectInfo, opts *mqtt.ClientOptions) mqtt.Client {
 	opts.SetClientID(clientID)
 	opts.AddBroker(info.MqttUrl)
 	opts.SetUsername(info.Username)
 	opts.SetPassword(info.Password)
-	opts.SetDefaultPublishHandler(defaultPublishHandler)
-	opts.SetOnConnectHandler(onConnectHandler)
-	opts.SetConnectionLostHandler(connectionLostHandler)
 	client := mqtt.NewClient(opts)
 	if conn := client.Connect(); conn.Wait() && conn.Error() != nil {
-		panic(conn.Error())
+		log.Println(conn.Error())
+		return nil
 	}
 	return client
 }
