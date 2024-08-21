@@ -18,9 +18,10 @@ import (
 
 func main() {
 	idMap := make(map[string]string)
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 10; i++ {
 		idMap[strconv.Itoa(i)] = fmt.Sprintf(`TEST/%d`, i)
 	}
+	client := mqttutils.NewMQTTClient("client-id", config.GlobalMqttConnectInfo)
 	for id, topic := range idMap {
 		go func() {
 			for {
@@ -32,9 +33,9 @@ func main() {
 				}
 				jsonMessage, _ := json.Marshal(msg)
 				//for i := 0; i < 100; i++ {
-				client := mqttutils.NewMQTTClient(id, config.GlobalMqttConnectInfo)
+				//client := mqttutils.NewMQTTClient(id, config.GlobalMqttConnectInfo)
 				publisher.PublishTelemetry(client, topic, jsonMessage)
-				time.Sleep(1000 * time.Millisecond)
+				time.Sleep(100 * time.Millisecond)
 			}
 		}()
 	}

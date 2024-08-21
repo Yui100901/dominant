@@ -33,7 +33,8 @@ var callback mqtt.MessageHandler = func(client mqtt.Client, mqttMsg mqtt.Message
 }
 
 func init() {
-	s = subscriber.NewSubscriber("mqtt_subscriber",
+	s = subscriber.NewSubscriber(
+		"mqtt_subscriber",
 		map[string]byte{
 			"TEST/+": 0,
 		},
