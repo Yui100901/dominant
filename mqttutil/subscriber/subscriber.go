@@ -6,6 +6,7 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
+	"time"
 )
 
 //
@@ -29,14 +30,11 @@ func NewSubscriber(id string, topicMap map[string]byte, callback mqtt.MessageHan
 	opts := mqtt.NewClientOptions()
 	opts.SetClientID(id)
 	//设置断开连接时自动重新连接
-	//opts.SetAutoReconnect(true)
-	opts.SetOnConnectHandler(func(client mqtt.Client) {
-		fmt.Println("Connected")
-		go s.Subscribe()
-	})
+	opts.SetAutoReconnect(true)
+	opts.SetOnConnectHandler(s.OnConnectHandler)
 	opts.SetConnectionLostHandler(ConnectionLostHandler)
-	client := mqttutils.NewMQTTClient(s.clientId, config.GlobalMqttConnectInfo, opts)
-	if conn := client.Connect(); conn.Wait() && conn.Error() != nil {
+	s.client = mqttutils.NewMQTTClient(s.clientId, config.GlobalMqttConnectInfo, opts)
+	if conn := s.client.Connect(); conn.Wait() && conn.Error() != nil {
 		log.Println(conn.Error())
 		return nil
 	}
@@ -51,8 +49,18 @@ func (s *Subscriber) Subscribe() {
 	res.Wait()
 }
 
+func (s *Subscriber) OnConnectHandler(client mqtt.Client) {
+	fmt.Println("Connected")
+	time.Sleep(5000 * time.Millisecond)
+	go client.SubscribeMultiple(s.topicMap, s.callback)
+}
+
 func ConnectionLostHandler(client mqtt.Client, err error) {
 	if conn := client.Connect(); conn.Wait() && conn.Error() != nil {
 		log.Println(conn.Error())
 	}
+}
+
+func (s *Subscriber) Disconnect() {
+	s.client.Disconnect(100)
 }

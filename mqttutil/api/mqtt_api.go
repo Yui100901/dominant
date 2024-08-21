@@ -39,6 +39,8 @@ func init() {
 			"TEST/+": 0,
 		},
 		callback)
+	//time.Sleep(3000 * time.Millisecond)
+	//s.Disconnect()
 }
 
 func GetNodeStatusList(c *gin.Context) {
