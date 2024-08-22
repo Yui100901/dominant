@@ -6,7 +6,6 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
-	"time"
 )
 
 //
@@ -51,7 +50,6 @@ func (s *Subscriber) Subscribe() {
 
 func (s *Subscriber) OnConnectHandler(client mqtt.Client) {
 	fmt.Println("Connected")
-	time.Sleep(5000 * time.Millisecond)
 	go client.SubscribeMultiple(s.topicMap, s.callback)
 }
 
@@ -62,5 +60,5 @@ func ConnectionLostHandler(client mqtt.Client, err error) {
 }
 
 func (s *Subscriber) Disconnect() {
-	s.client.Disconnect(100)
+	s.client.Disconnect(1000)
 }

@@ -7,7 +7,7 @@ import (
 
 const (
 	IP      = "127.0.0.1" //控制端连接IP
-	Port    = "7700"      //控制端连接端口
+	Port    = "27777"     //控制端连接端口
 	BaseUrl = "http://" + IP + ":" + Port
 )
 

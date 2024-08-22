@@ -34,7 +34,7 @@ func main() {
 				//for i := 0; i < 100; i++ {
 				//client := mqttutils.NewMQTTClient(id, config.GlobalMqttConnectInfo)
 				p.Publish(topic, jsonMessage)
-				time.Sleep(10 * time.Millisecond)
+				time.Sleep(100 * time.Millisecond)
 			}
 		}()
 	}
