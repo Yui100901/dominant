@@ -14,7 +14,10 @@ type MqttConnectInfo struct {
 }
 
 func init() {
-	GlobalMqttConnectInfo.MqttUrl = "tcp://42.192.69.243:11883"
+	//GlobalMqttConnectInfo.MqttUrl = "tcp://42.192.69.243:11883"
+	//GlobalMqttConnectInfo.Username = "root"
+	//GlobalMqttConnectInfo.Password = "yfy20010910"
+	GlobalMqttConnectInfo.MqttUrl = "tcp://192.168.1.200:11883"
 	GlobalMqttConnectInfo.Username = "root"
-	GlobalMqttConnectInfo.Password = "yfy20010910"
+	GlobalMqttConnectInfo.Password = "rabbitmqzmkj123456"
 }

@@ -14,7 +14,10 @@ type RedisConnectInfo struct {
 }
 
 func init() {
-	GlobalRedisConnectInfo.RedisUrl = "42.192.69.243:6379"
+	//GlobalRedisConnectInfo.RedisUrl = "42.192.69.243:6379"
+	//GlobalRedisConnectInfo.Username = ""
+	//GlobalRedisConnectInfo.Password = "yfy20010910"
+	GlobalRedisConnectInfo.RedisUrl = "192.168.1.200:6379"
 	GlobalRedisConnectInfo.Username = ""
-	GlobalRedisConnectInfo.Password = "yfy20010910"
+	GlobalRedisConnectInfo.Password = "rediszmkj123456"
 }
