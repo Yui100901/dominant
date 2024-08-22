@@ -16,17 +16,19 @@ type Node struct {
 	IsAlive   bool           //存活标记
 	AliveChan chan bool      //心跳通道
 	//NodeType string                //节点类型
-	TopicMap map[string]string //节点订阅主题表
+	TopicMap     map[string]string //节点订阅主题表
+	RealtimeInfo any               //实时数据
 }
 
 func NewNode(id, addr string) *Node {
 	//id := uuid.NewV4().String()
 	return &Node{
-		ID:        id,
-		Addr:      addr,
-		MQ:        message.NewMessageQueue(),
-		IsAlive:   true, //节点创建时默认存活状态
-		AliveChan: make(chan bool),
-		TopicMap:  make(map[string]string),
+		ID:           id,
+		Addr:         addr,
+		MQ:           message.NewMessageQueue(),
+		IsAlive:      true, //节点创建时默认存活状态
+		AliveChan:    make(chan bool),
+		TopicMap:     make(map[string]string),
+		RealtimeInfo: nil,
 	}
 }
