@@ -3,7 +3,6 @@ package publisher
 import (
 	"dominant/config"
 	"dominant/mqttutil"
-	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 )
@@ -40,10 +39,11 @@ func (p *Publisher) Publish(topic string, payload any) {
 }
 
 func OnConnectHandler(client mqtt.Client) {
-	fmt.Println("Connected")
+	log.Println("Publisher Connected!")
 }
 
 func ConnectionLostHandler(client mqtt.Client, err error) {
+	log.Println("Publisher Connection Lost!")
 	if conn := client.Connect(); conn.Wait() && conn.Error() != nil {
 		log.Println(conn.Error())
 	}

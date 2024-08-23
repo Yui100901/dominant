@@ -91,7 +91,7 @@ func (b *Broker) Register(id, addr string, state []byte) {
 	n := b.NodeMap[id]
 	if n == nil {
 		//id为空则向全局map中注册
-		n = node.NewNode(id, addr)
+		n = node.NewNode(id, addr, state)
 		b.NodeMap[id] = n
 		//启动保活协程
 		go b.keepAlive(id)
@@ -105,6 +105,7 @@ func (b *Broker) Register(id, addr string, state []byte) {
 			n.IsAlive = true
 			go b.keepAlive(id)
 		}
+		n.RealtimeInfo = state
 	}
 	ctx := context.Background()
 	redis_utils.GlobalRedisClient.Set(ctx, n.ID, state, 60*time.Second)

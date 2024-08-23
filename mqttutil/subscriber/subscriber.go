@@ -3,7 +3,6 @@ package subscriber
 import (
 	"dominant/config"
 	mqttutils "dominant/mqttutil"
-	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 )
@@ -49,11 +48,12 @@ func (s *Subscriber) Subscribe() {
 }
 
 func (s *Subscriber) OnConnectHandler(client mqtt.Client) {
-	fmt.Println("Connected")
+	log.Println("Subscriber Connected!")
 	go client.SubscribeMultiple(s.topicMap, s.callback)
 }
 
 func ConnectionLostHandler(client mqtt.Client, err error) {
+	log.Println("Subscriber Connection Lost!")
 	if conn := client.Connect(); conn.Wait() && conn.Error() != nil {
 		log.Println(conn.Error())
 	}
