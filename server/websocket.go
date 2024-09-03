@@ -34,11 +34,11 @@ func NewWebSocket(w http.ResponseWriter, r *http.Request) *WebSocket {
 		log.Println(err)
 		return nil
 	}
-	interval := 1
+	interval := 1000
 	return &WebSocket{
 		Conn:   conn,
 		Done:   make(chan struct{}),
-		ticker: time.NewTicker(time.Second * time.Duration(interval)),
+		ticker: time.NewTicker(time.Millisecond * time.Duration(interval)),
 	}
 }
 
