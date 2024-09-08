@@ -1,7 +1,6 @@
-package message
+package mq
 
 import (
-	"dominant/mq"
 	"math/rand"
 	"strconv"
 	"time"
@@ -33,7 +32,7 @@ func NewMessage(topic, messageType, src string, dstList []string, content any) *
 		Src:           src,
 		PresetDstList: dstList,
 		ActualDstList: []string{},
-		CreateTime:    time.Now().Format(mq.DateTimeFormat),
+		CreateTime:    time.Now().Format(DateTimeFormat),
 		ConsumeTime:   "",
 		Content:       content,
 	}
