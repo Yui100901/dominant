@@ -1,4 +1,4 @@
-package api
+package mqtt_api
 
 import (
 	"dominant/broker"

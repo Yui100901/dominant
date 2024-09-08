@@ -1,4 +1,4 @@
-package node
+package broker
 
 import (
 	"dominant/mq/message"
@@ -20,7 +20,7 @@ type Node struct {
 	RealtimeInfo any               //实时数据
 }
 
-func NewNode(id, addr string) *Node {
+func NewNode(id, addr string, info any) *Node {
 	//id := uuid.NewV4().String()
 	return &Node{
 		ID:           id,
@@ -29,6 +29,6 @@ func NewNode(id, addr string) *Node {
 		IsAlive:      true, //节点创建时默认存活状态
 		AliveChan:    make(chan bool),
 		TopicMap:     make(map[string]string),
-		RealtimeInfo: nil,
+		RealtimeInfo: info,
 	}
 }

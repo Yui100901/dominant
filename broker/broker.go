@@ -3,7 +3,6 @@ package broker
 import (
 	"context"
 	"dominant/mq/message"
-	"dominant/mq/node"
 	"dominant/redis_utils"
 	"fmt"
 	"log"
@@ -17,20 +16,20 @@ import (
 // @Date 2024/7/3 13 49
 //
 
-type nodeMap map[string]*node.Node
+type nodeMap map[string]*Node
 type messageChanSlice []chan *message.Message
 
 type Broker struct {
 	//OnlineNodes nodeMap
-	NodeMap map[string]*node.Node //所有节点
-	MainMQ  *message.Queue        //全局主队列
+	NodeMap map[string]*Node //所有节点
+	MainMQ  *message.Queue   //全局主队列
 	rwm     sync.RWMutex
 }
 
 func NewBroker() *Broker {
 	return &Broker{
 		//OnlineNodes: make(nodeMap),
-		NodeMap: make(map[string]*node.Node),
+		NodeMap: make(map[string]*Node),
 		MainMQ:  message.NewMessageQueue(),
 		rwm:     sync.RWMutex{},
 	}
@@ -91,7 +90,7 @@ func (b *Broker) Register(id, addr string, state []byte) {
 	n := b.NodeMap[id]
 	if n == nil {
 		//id为空则向全局map中注册
-		n = node.NewNode(id, addr, state)
+		n = NewNode(id, addr, state)
 		b.NodeMap[id] = n
 		//启动保活协程
 		go b.keepAlive(id)
@@ -119,7 +118,7 @@ func (b *Broker) Unregister(id string) {
 }
 
 // GetNodeById 根据id获取一个节点
-func (b *Broker) GetNodeById(id string) *node.Node {
+func (b *Broker) GetNodeById(id string) *Node {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
 	n := b.NodeMap[id]
@@ -127,11 +126,11 @@ func (b *Broker) GetNodeById(id string) *node.Node {
 }
 
 // GetAliveNodeIDList 获取所有在线节点ID和节点详细信息
-func (b *Broker) GetAliveNodeIDList() ([]string, []node.Node) {
+func (b *Broker) GetAliveNodeIDList() ([]string, []Node) {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
 	var onlineNodeIdList []string
-	var onlineNodeList []node.Node
+	var onlineNodeList []Node
 	for id, n := range b.NodeMap {
 		if n.IsAlive {
 			onlineNodeIdList = append(onlineNodeIdList, id)
