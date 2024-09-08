@@ -2,7 +2,6 @@ package main
 
 import (
 	"dominant/api/http_api"
-	"dominant/api/mqtt_api"
 	"dominant/server"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -15,7 +14,7 @@ func main() {
 	r.POST("/newMessage", http_api.NewMessage)
 	r.GET("/getClientList", http_api.GetClientList)
 	//获取节点状态
-	r.GET("/getNodeStatusList", mqtt_api.GetNodeStatusList)
+	r.GET("/getNodeStatusList", http_api.GetNodeStatusList)
 	//获取节点状态-WebSocket
 	r.GET("/wsGetNodeStatusList", func(c *gin.Context) {
 		http_api.ServeWebSocket(c.Writer, c.Request)

@@ -43,3 +43,15 @@ func ServeWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	<-ws.Done
 }
+
+func GetNodeStatusList(c *gin.Context) {
+	msgList := broker.GlobalBroker.GetAliveNodeMessage()
+	var messageList []*message.Message
+	for _, msg := range msgList {
+		stringMessage := msg.(string)
+		mqttMessage := new(message.Message)
+		json.Unmarshal([]byte(stringMessage), mqttMessage)
+		messageList = append(messageList, mqttMessage)
+	}
+	c.JSON(http.StatusOK, msgList)
+}
