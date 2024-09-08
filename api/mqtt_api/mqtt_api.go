@@ -2,7 +2,7 @@ package mqtt_api
 
 import (
 	"dominant/broker"
-	"dominant/mq/message"
+	"dominant/mq"
 	mqttutils "dominant/mqtt_util"
 	"dominant/mqtt_util/subscriber"
 	"encoding/json"
@@ -26,7 +26,7 @@ var callback mqtt.MessageHandler = func(client mqtt.Client, mqttMsg mqtt.Message
 	if err != nil {
 		log.Fatal(err)
 	}
-	msg := message.NewMessage(topic, "status", mqttMessage.NodeId, []string{topic}, mqttMessage)
+	msg := mq.NewMessage(topic, "status", mqttMessage.NodeId, []string{topic}, mqttMessage)
 	broker.GlobalBroker.Register(mqttMessage.NodeId, msg.Topic, payload)
 }
 

@@ -2,7 +2,7 @@ package http_api
 
 import (
 	"dominant/broker"
-	"dominant/mq/message"
+	"dominant/mq"
 	"dominant/server"
 	"encoding/json"
 	"fmt"
@@ -18,7 +18,7 @@ import (
 
 func NewMessage(c *gin.Context) {
 	body, _ := io.ReadAll(c.Request.Body)
-	msg := &message.Message{}
+	msg := &mq.Message{}
 	err := json.Unmarshal(body, msg)
 	if err != nil {
 		return
@@ -30,7 +30,7 @@ func NewMessage(c *gin.Context) {
 
 func GetClientList(c *gin.Context) {
 	aliveList, _ := broker.GlobalBroker.GetAliveNodeIDList()
-	msg := message.NewMessage("", "", "Server", []string{}, aliveList)
+	msg := mq.NewMessage("", "", "Server", []string{}, aliveList)
 	c.JSON(http.StatusOK, msg)
 }
 
@@ -46,10 +46,10 @@ func ServeWebSocket(w http.ResponseWriter, r *http.Request) {
 
 func GetNodeStatusList(c *gin.Context) {
 	msgList := broker.GlobalBroker.GetAliveNodeMessage()
-	var messageList []*message.Message
+	var messageList []*mq.Message
 	for _, msg := range msgList {
 		stringMessage := msg.(string)
-		mqttMessage := new(message.Message)
+		mqttMessage := new(mq.Message)
 		json.Unmarshal([]byte(stringMessage), mqttMessage)
 		messageList = append(messageList, mqttMessage)
 	}

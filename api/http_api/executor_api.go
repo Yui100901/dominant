@@ -2,7 +2,7 @@ package http_api
 
 import (
 	"dominant/broker"
-	"dominant/mq/message"
+	"dominant/mq"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -15,9 +15,9 @@ import (
 
 func GetMessage(c *gin.Context) {
 	ip := c.ClientIP()
-	id := c.Query("id")
+	nodeId := c.Query("nodeId")
 	fmt.Println(ip)
-	msg := broker.GlobalBroker.GetMessage(id)
+	msg := broker.GlobalBroker.GetMessage(nodeId)
 	c.JSON(http.StatusOK, msg)
 }
 
@@ -28,7 +28,7 @@ func Register(c *gin.Context) {
 		//获取请求体中json数据
 		id := body["id"].(string)
 		broker.GlobalBroker.Register(id, ipAddr, []byte(""))
-		msg := message.NewMessage("", "", "Server", []string{id}, "Alive Success!")
+		msg := mq.NewMessage("", "", "Server", []string{id}, "Alive Success!")
 		c.JSON(http.StatusOK, msg)
 	}
 }

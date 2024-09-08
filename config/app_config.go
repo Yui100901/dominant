@@ -29,8 +29,14 @@ type MQTTConfiguration struct {
 }
 
 type RedisConfiguration struct {
-	URL      string `yaml:"url"`
-	Password string `yaml:"password"`
+	URL          string `yaml:"url"`
+	Password     string `yaml:"password"`
+	DB           int    `yaml:"DB"`
+	DialTimeout  int    `yaml:"DialTimeout"`
+	ReadTimeout  int    `yaml:"ReadTimeout"`
+	WriteTimeout int    `yaml:"WriteTimeout"`
+	PoolSize     int    `yaml:"PoolSize"`
+	PoolTimeout  int    `yaml:"PoolTimeout"`
 }
 
 var Config Configuration

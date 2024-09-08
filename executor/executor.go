@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"dominant/mq/message"
+	"dominant/mq"
 	"dominant/server"
 	"encoding/json"
 	"fmt"
@@ -56,7 +56,7 @@ func main() {
 	}
 }
 
-func getMessage() *message.Message {
+func getMessage() *mq.Message {
 	url := fmt.Sprintf("%s/getMessage", BaseUrl)
 	req, _ := http.NewRequest("GET", url, nil)
 	query := req.URL.Query()
@@ -67,7 +67,7 @@ func getMessage() *message.Message {
 		return nil
 	}
 	body, err := io.ReadAll(resp.Body)
-	msg := &message.Message{}
+	msg := &mq.Message{}
 	err = json.Unmarshal(body, msg)
 	if err != nil {
 		return nil
@@ -75,7 +75,7 @@ func getMessage() *message.Message {
 	return msg
 }
 
-func postFeedback(m *message.Message) {
+func postFeedback(m *mq.Message) {
 
 }
 
@@ -88,7 +88,7 @@ func alive() {
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
 	resp, err := client.Do(req)
 	body, err := io.ReadAll(resp.Body)
-	msg := &message.Message{}
+	msg := &mq.Message{}
 	err = json.Unmarshal(body, msg)
 	if err != nil {
 		return

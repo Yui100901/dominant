@@ -17,12 +17,12 @@ func NewRedisClient(config config.Configuration) *redis.Client {
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:         config.Redis.URL,
 		Password:     config.Redis.Password,
-		DB:           0,
-		DialTimeout:  10 * time.Second,
-		ReadTimeout:  30 * time.Second,
-		WriteTimeout: 30 * time.Second,
-		PoolSize:     20,
-		PoolTimeout:  30 * time.Second,
+		DB:           config.Redis.DB,
+		DialTimeout:  time.Duration(config.Redis.DialTimeout) * time.Second,
+		ReadTimeout:  time.Duration(config.Redis.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(config.Redis.WriteTimeout) * time.Second,
+		PoolSize:     config.Redis.PoolSize,
+		PoolTimeout:  time.Duration(config.Redis.PoolTimeout) * time.Second,
 	})
 	return redisClient
 }

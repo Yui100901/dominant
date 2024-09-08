@@ -15,7 +15,7 @@ type Node struct {
 	MQ        *mq.Queue //节点队列
 	IsAlive   bool      //存活标记
 	AliveChan chan bool //心跳通道
-	//NodeType string                //节点类型
+	//NodeType     string            //节点类型
 	TopicMap     map[string]string //节点订阅主题表
 	RealtimeInfo any               //实时数据
 }

@@ -3,7 +3,6 @@ package broker
 import (
 	"context"
 	"dominant/mq"
-	"dominant/mq/message"
 	"dominant/redis_utils"
 	"fmt"
 	"log"
@@ -18,7 +17,7 @@ import (
 //
 
 type nodeMap map[string]*Node
-type messageChanSlice []chan *message.Message
+type messageChanSlice []chan *mq.Message
 
 type Broker struct {
 	//OnlineNodes nodeMap
@@ -37,7 +36,7 @@ func NewBroker() *Broker {
 }
 
 // Distribute 消息分发实现，根据预设目的地设置实际目的地并进行分发
-func (b *Broker) Distribute() <-chan *message.Message {
+func (b *Broker) Distribute() <-chan *mq.Message {
 	for {
 		select {
 		case msg := <-b.MainMQ.MessageChan:
@@ -71,7 +70,7 @@ func randomStringFromSlice(slice []string) string {
 }
 
 // Send 消息发送
-func (b *Broker) Send(msg *message.Message) {
+func (b *Broker) Send(msg *mq.Message) {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
 	if msg.Type == "command" {
@@ -154,12 +153,12 @@ func (b *Broker) GetAliveNodeMessage() []any {
 	return messageList
 }
 
-// GetMessage 根据id定位一则消息
-func (b *Broker) GetMessage(id string) *message.Message {
+// GetMessage 根据节点id定位一则消息
+func (b *Broker) GetMessage(nodeId string) *mq.Message {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
-	msg := &message.Message{}
-	if n, ok := b.NodeMap[id]; ok {
+	msg := &mq.Message{}
+	if n, ok := b.NodeMap[nodeId]; ok {
 		msg = n.MQ.Dequeue()
 	}
 	return msg
