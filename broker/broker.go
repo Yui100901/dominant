@@ -2,6 +2,7 @@ package broker
 
 import (
 	"context"
+	"dominant/mq"
 	"dominant/mq/message"
 	"dominant/redis_utils"
 	"fmt"
@@ -22,7 +23,7 @@ type messageChanSlice []chan *message.Message
 type Broker struct {
 	//OnlineNodes nodeMap
 	NodeMap map[string]*Node //所有节点
-	MainMQ  *message.Queue   //全局主队列
+	MainMQ  *mq.Queue        //全局主队列
 	rwm     sync.RWMutex
 }
 
@@ -30,7 +31,7 @@ func NewBroker() *Broker {
 	return &Broker{
 		//OnlineNodes: make(nodeMap),
 		NodeMap: make(map[string]*Node),
-		MainMQ:  message.NewMessageQueue(),
+		MainMQ:  mq.NewMessageQueue(),
 		rwm:     sync.RWMutex{},
 	}
 }
@@ -107,6 +108,7 @@ func (b *Broker) Register(id, addr string, state []byte) {
 		n.RealtimeInfo = state
 	}
 	ctx := context.Background()
+	//刷新redis存储的最新状态
 	redis_utils.GlobalRedisClient.Set(ctx, n.ID, state, 60*time.Second)
 }
 

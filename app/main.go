@@ -11,6 +11,7 @@ import (
 
 func main() {
 	r := server.NewServer()
+	//创建一则新消息
 	r.POST("/newMessage", http_api.NewMessage)
 	r.GET("/getClientList", http_api.GetClientList)
 	//获取节点状态

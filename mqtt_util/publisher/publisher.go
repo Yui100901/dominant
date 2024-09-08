@@ -2,7 +2,7 @@ package publisher
 
 import (
 	"dominant/config"
-	"dominant/mqttutil"
+	"dominant/mqtt_util"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 )
