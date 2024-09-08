@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"dominant/mq/message"
+	"dominant/mq"
 	"dominant/server"
 	"encoding/json"
 	"fmt"
@@ -62,7 +62,7 @@ func GetCommand() {
 			continue
 		}
 		//clientList, _ := getClientList()
-		msg := message.NewMessage("", "command", "true", nil, line)
+		msg := mq.NewMessage("", "command", "true", nil, line)
 		res := newMessage(msg)
 		fmt.Println(res)
 	}
@@ -76,7 +76,7 @@ func getClientList() ([]string, error) {
 		return []string{}, err
 	}
 	body, err := io.ReadAll(resp.Body)
-	msg := &message.Message{}
+	msg := &mq.Message{}
 	err = json.Unmarshal(body, msg)
 	if err != nil {
 		return []string{}, err
@@ -85,7 +85,7 @@ func getClientList() ([]string, error) {
 	return clientList, nil
 }
 
-func newMessage(msg *message.Message) string {
+func newMessage(msg *mq.Message) string {
 	url := fmt.Sprintf("%s/newMessage", BaseUrl)
 	bytesMessage, err := json.Marshal(*msg)
 	if err != nil {

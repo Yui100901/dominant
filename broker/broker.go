@@ -5,6 +5,7 @@ import (
 	"dominant/mq"
 	"dominant/redis_utils"
 	"fmt"
+	"github.com/google/uuid"
 	"log"
 	"math/rand"
 	"sync"
@@ -83,39 +84,68 @@ func (b *Broker) Send(msg *mq.Message) {
 	}
 }
 
-// Register 将某个id注册为在线节点
-func (b *Broker) Register(id, addr string, state []byte) {
+// Login 节点登录
+func (b *Broker) Login(id, addr string, state []byte) string {
+	b.rwm.Lock()
+	defer b.rwm.Unlock()
+	n := b.NodeMap[id]
+	if n != nil {
+		//id已经存在
+		if n.IsAlive {
+			//该节点存活，使存活节点下线
+			b.Unregister(id)
+		}
+	}
+	token := uuid.NewString()
+	//重新给节点分配token
+	n = NewNode(id, addr, token, state)
+	n.RealtimeInfo = state
+	//存入全局节点表
+	b.NodeMap[id] = n
+	log.Println("登录id", id)
+	log.Printf("%v", b.NodeMap[id].Token)
+	//启动保活协程
+	go b.keepAlive(id)
+	ctx := context.Background()
+	//刷新redis存储的最新状态
+	redis_utils.GlobalRedisClient.Set(ctx, n.ID, state, 60*time.Second)
+	return token
+}
+
+// Verify 节点在线验证
+func (b *Broker) Verify(id, token string, state []byte) bool {
 	b.rwm.Lock()
 	defer b.rwm.Unlock()
 	n := b.NodeMap[id]
 	if n == nil {
-		//id为空则向全局map中注册
-		n = NewNode(id, addr, state)
-		b.NodeMap[id] = n
-		//启动保活协程
-		go b.keepAlive(id)
+		//节点未登录
+		log.Println("非法的节点id", id)
+		return false
 	} else {
 		//id已经存在
 		if n.IsAlive {
 			//该节点存活，向目标节点发送保活消息
-			n.AliveChan <- true
+			if n.Token == token {
+				n.AliveChan <- true
+			} else {
+				log.Println("token过期")
+				return false
+			}
 		} else {
-			//该节点未存活，则使该节点重新上线
-			n.IsAlive = true
-			go b.keepAlive(id)
+			log.Println("请重新登录")
+			return false
 		}
 		n.RealtimeInfo = state
 	}
 	ctx := context.Background()
 	//刷新redis存储的最新状态
 	redis_utils.GlobalRedisClient.Set(ctx, n.ID, state, 60*time.Second)
+	return true
 }
 
 // Unregister 取消某个id的节点在线状态
 func (b *Broker) Unregister(id string) {
-	b.rwm.Lock()
-	defer b.rwm.Unlock()
-	b.NodeMap[id].IsAlive = false
+	b.NodeMap[id].AliveChan <- false
 }
 
 // GetNodeById 根据id获取一个节点
@@ -169,12 +199,18 @@ func (b *Broker) keepAlive(id string) {
 	n := b.GetNodeById(id)
 	for {
 		select {
-		case <-n.AliveChan:
-			continue
+		case alive := <-n.AliveChan:
+			if alive {
+				continue
+			} else {
+				//收到下线指令，退出保活协程
+				n.IsAlive = false
+				return
+			}
 		case <-time.After(time.Second * 60):
-			b.Unregister(id)
 			log.Println(id, "超时退出！")
-			return // 超时，说明未在线
+			n.IsAlive = false
+			b.Unregister(id)
 		}
 	}
 }

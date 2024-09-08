@@ -5,6 +5,7 @@ import (
 	"dominant/mq"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -21,14 +22,28 @@ func GetMessage(c *gin.Context) {
 	c.JSON(http.StatusOK, msg)
 }
 
-func Register(c *gin.Context) {
+func Login(c *gin.Context) {
 	ipAddr := c.ClientIP()
 	body := make(map[string]any)
 	if err := c.ShouldBind(&body); err == nil {
 		//获取请求体中json数据
 		id := body["id"].(string)
-		broker.GlobalBroker.Register(id, ipAddr, []byte(""))
-		msg := mq.NewMessage("", "", "Server", []string{id}, "Alive Success!")
+		log.Println("接收到id:", id)
+		token := broker.GlobalBroker.Login(id, ipAddr, []byte("Login test"))
+		msg := mq.NewMessage("", "", "Server", []string{id}, token)
+		c.JSON(http.StatusOK, msg)
+	}
+}
+
+func Verify(c *gin.Context) {
+	//ipAddr := c.ClientIP()
+	body := make(map[string]any)
+	if err := c.ShouldBind(&body); err == nil {
+		//获取请求体中json数据
+		id := body["id"].(string)
+		token := body["token"].(string)
+		flag := broker.GlobalBroker.Verify(id, token, []byte("Verify test"))
+		msg := mq.NewMessage("", "", "Server", []string{id}, flag)
 		c.JSON(http.StatusOK, msg)
 	}
 }

