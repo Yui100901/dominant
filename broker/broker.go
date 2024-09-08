@@ -214,3 +214,9 @@ func (b *Broker) keepAlive(id string) {
 		}
 	}
 }
+
+func VerifyCode(expirationTime time.Time) bool {
+	currentTime := time.Now()
+	valid := currentTime.Before(expirationTime)
+	return valid
+}
