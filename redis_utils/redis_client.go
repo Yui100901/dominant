@@ -13,10 +13,10 @@ import (
 
 var GlobalRedisClient *redis.Client
 
-func NewRedisClient(info config.RedisConnectInfo) *redis.Client {
+func NewRedisClient(config config.Configuration) *redis.Client {
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:         info.RedisUrl,
-		Password:     info.Password,
+		Addr:         config.Redis.URL,
+		Password:     config.Redis.Password,
 		DB:           0,
 		DialTimeout:  10 * time.Second,
 		ReadTimeout:  30 * time.Second,
@@ -28,5 +28,5 @@ func NewRedisClient(info config.RedisConnectInfo) *redis.Client {
 }
 
 func init() {
-	GlobalRedisClient = NewRedisClient(config.GlobalRedisConnectInfo)
+	GlobalRedisClient = NewRedisClient(config.Config)
 }

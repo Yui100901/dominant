@@ -31,7 +31,7 @@ func NewBroker() *Broker {
 	return &Broker{
 		//OnlineNodes: make(nodeMap),
 		NodeMap: make(map[string]*Node),
-		MainMQ:  mq.NewMessageQueue(),
+		MainMQ:  mq.NewQueue(),
 		rwm:     sync.RWMutex{},
 	}
 }

@@ -23,7 +23,7 @@ func NewPublisher(id string) *Publisher {
 	opts.SetDefaultPublishHandler(DefaultPublishHandler)
 	opts.SetOnConnectHandler(OnConnectHandler)
 	opts.SetConnectionLostHandler(ConnectionLostHandler)
-	client := mqttutil.NewMQTTClient(id, config.GlobalMqttConnectInfo, opts)
+	client := mqttutil.NewMQTTClient(id, config.Config, opts)
 	return &Publisher{
 		clientId: id,
 		Client:   client,

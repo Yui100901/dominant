@@ -25,7 +25,7 @@ func NewNode(id, addr string, info any) *Node {
 	return &Node{
 		ID:           id,
 		Addr:         addr,
-		MQ:           mq.NewMessageQueue(),
+		MQ:           mq.NewQueue(),
 		IsAlive:      true, //节点创建时默认存活状态
 		AliveChan:    make(chan bool),
 		TopicMap:     make(map[string]string),

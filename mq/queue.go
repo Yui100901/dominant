@@ -14,12 +14,14 @@ import (
 type Queue struct {
 	MessageHistory map[string]*message.Message //消息历史
 	MessageChan    chan *message.Message       //消息通道，用于发送消息
+	SaveHistory    bool
 	rwm            sync.RWMutex
 }
 
-func NewMessageQueue() *Queue {
+func NewQueue() *Queue {
 	return &Queue{
 		MessageHistory: make(map[string]*message.Message),
+		SaveHistory:    false,
 		MessageChan:    make(chan *message.Message, DefaultChanSize),
 	}
 }
@@ -27,7 +29,9 @@ func NewMessageQueue() *Queue {
 func (mq *Queue) Enqueue(msg *message.Message) {
 	mq.rwm.Lock()
 	defer mq.rwm.Unlock()
-	mq.MessageHistory[msg.ID] = msg
+	if mq.SaveHistory {
+		mq.MessageHistory[msg.ID] = msg
+	}
 	mq.MessageChan <- msg
 }
 

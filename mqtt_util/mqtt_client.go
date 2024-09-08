@@ -21,11 +21,11 @@ type MQTTClient struct {
 	client   mqtt.Client
 }
 
-func NewMQTTClient(clientID string, info config.MqttConnectInfo, opts *mqtt.ClientOptions) mqtt.Client {
+func NewMQTTClient(clientID string, config config.Configuration, opts *mqtt.ClientOptions) mqtt.Client {
 	opts.SetClientID(clientID)
-	opts.AddBroker(info.MqttUrl)
-	opts.SetUsername(info.Username)
-	opts.SetPassword(info.Password)
+	opts.AddBroker(config.MQTT.URL)
+	opts.SetUsername(config.MQTT.Username)
+	opts.SetPassword(config.MQTT.Password)
 	client := mqtt.NewClient(opts)
 	if conn := client.Connect(); conn.Wait() && conn.Error() != nil {
 		log.Println(conn.Error())
