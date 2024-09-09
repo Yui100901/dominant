@@ -37,11 +37,11 @@ func Login(c *gin.Context) {
 
 func Verify(c *gin.Context) {
 	//ipAddr := c.ClientIP()
-	body := make(map[string]any)
-	if err := c.ShouldBind(&body); err == nil {
+	var cmd VerifyCommand
+	if err := c.ShouldBind(&cmd); err == nil {
 		//获取请求体中json数据
-		id := body["id"].(string)
-		token := body["token"].(string)
+		id := cmd.ID
+		token := cmd.Token
 		flag := broker.GlobalBroker.Verify(id, token, []byte("Verify test"))
 		msg := mq.NewMessage("", "", "Server", []string{id}, flag)
 		c.JSON(http.StatusOK, msg)
