@@ -43,7 +43,7 @@ var Config Configuration
 
 func init() {
 	// 获取环境变量
-	env := "prod" // 默认环境为 dev
+	env := "dev" // 默认环境为 dev
 
 	// 设置配置文件名和路径
 	viper.SetConfigName(fmt.Sprintf("config-%s", env))

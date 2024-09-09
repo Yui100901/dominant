@@ -12,6 +12,7 @@ import (
 
 type RegisterCode struct {
 	ID             string    `json:"id"`
+	NodeId         string    `json:"nodeId"`
 	Code           string    `json:"code"`
 	CreateTime     time.Time `json:"createTime"`
 	ValidTime      int       `json:"validTime"`
