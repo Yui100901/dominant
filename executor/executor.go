@@ -3,8 +3,9 @@ package main
 import (
 	"bytes"
 	"dominant/api/http_api"
-	"dominant/mq"
-	"dominant/server"
+	"dominant/api/server"
+	"dominant/infrastructure/messaging/mq"
+
 	"encoding/json"
 	"fmt"
 	"io"
