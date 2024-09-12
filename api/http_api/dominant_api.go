@@ -1,9 +1,9 @@
 package http_api
 
 import (
-	"dominant/broker"
-	"dominant/mq"
-	"dominant/server"
+	"dominant/api/server"
+	"dominant/domain/broker"
+	"dominant/infrastructure/messaging/mq"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
