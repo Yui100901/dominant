@@ -20,11 +20,11 @@ type Authentication struct {
 	ExpirationTime time.Time `json:"expirationTime"`
 }
 
-func NewAuthentication(validTime int) *Authentication {
+func NewAuthentication(nodeId string, validTime int) *Authentication {
 	id := uuid.NewString()
 	return &Authentication{
 		ID:             id,
-		NodeId:         id,
+		NodeId:         nodeId,
 		CreateTime:     time.Now(),
 		ValidTime:      validTime,
 		IsActive:       false,
@@ -33,17 +33,25 @@ func NewAuthentication(validTime int) *Authentication {
 	}
 }
 
-func (c Authentication) Active() {
-	if c.IsActive {
+// Active 激活认证
+func (a *Authentication) Active() {
+	if a.IsActive {
 		return
 	}
-	c.ActiveTime = time.Now()
-	c.ExpirationTime = c.ActiveTime.Add(time.Duration(c.ValidTime) * time.Hour)
-	c.IsActive = true
+	a.ActiveTime = time.Now()
+	a.ExpirationTime = a.ActiveTime.Add(time.Duration(a.ValidTime) * time.Hour)
+	a.IsActive = true
 }
 
-func (c Authentication) Verify() bool {
+// Verify 验证激活状态
+func (a *Authentication) Verify() bool {
+	if !a.IsActive {
+		return false
+	}
 	currentTime := time.Now()
-	valid := currentTime.Before(c.ExpirationTime)
-	return valid
+	if currentTime.After(a.ExpirationTime) {
+		a.IsActive = false
+		return false
+	}
+	return true
 }

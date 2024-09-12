@@ -1,8 +1,6 @@
-package broker
+package node
 
-import (
-	"dominant/mq"
-)
+import "dominant/infrastructure/messaging/mq"
 
 //
 // @Author yfy2001
