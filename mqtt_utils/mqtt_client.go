@@ -1,4 +1,4 @@
-package mqttutil
+package mqtt_utils
 
 import (
 	"dominant/config"

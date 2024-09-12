@@ -2,7 +2,7 @@ package subscriber
 
 import (
 	"dominant/config"
-	mqttutils "dominant/mqtt_util"
+	"dominant/mqtt_utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 )
@@ -31,7 +31,7 @@ func NewSubscriber(id string, topicMap map[string]byte, callback mqtt.MessageHan
 	opts.SetAutoReconnect(true)
 	opts.SetOnConnectHandler(s.OnConnectHandler)
 	opts.SetConnectionLostHandler(ConnectionLostHandler)
-	s.client = mqttutils.NewMQTTClient(s.clientId, config.Config, opts)
+	s.client = mqtt_utils.NewMQTTClient(s.clientId, config.Config, opts)
 	if conn := s.client.Connect(); conn.Wait() && conn.Error() != nil {
 		log.Println(conn.Error())
 		return nil

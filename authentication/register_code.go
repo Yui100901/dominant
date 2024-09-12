@@ -10,10 +10,9 @@ import (
 // @Date 2024/9/8 22 47
 //
 
-type RegisterCode struct {
+type Authentication struct {
 	ID             string    `json:"id"`
 	NodeId         string    `json:"nodeId"`
-	Code           string    `json:"code"`
 	CreateTime     time.Time `json:"createTime"`
 	ValidTime      int       `json:"validTime"`
 	IsActive       bool      `json:"isActive"`
@@ -21,11 +20,11 @@ type RegisterCode struct {
 	ExpirationTime time.Time `json:"expirationTime"`
 }
 
-func NewRegisterCode(validTime int) *RegisterCode {
+func NewAuthentication(validTime int) *Authentication {
 	id := uuid.NewString()
-	return &RegisterCode{
+	return &Authentication{
 		ID:             id,
-		Code:           id,
+		NodeId:         id,
 		CreateTime:     time.Now(),
 		ValidTime:      validTime,
 		IsActive:       false,
@@ -34,7 +33,7 @@ func NewRegisterCode(validTime int) *RegisterCode {
 	}
 }
 
-func (c RegisterCode) Active() {
+func (c Authentication) Active() {
 	if c.IsActive {
 		return
 	}
@@ -43,7 +42,7 @@ func (c RegisterCode) Active() {
 	c.IsActive = true
 }
 
-func (c RegisterCode) Verify() bool {
+func (c Authentication) Verify() bool {
 	currentTime := time.Now()
 	valid := currentTime.Before(c.ExpirationTime)
 	return valid

@@ -2,7 +2,8 @@ package publisher
 
 import (
 	"dominant/config"
-	"dominant/mqtt_util"
+	"dominant/mqtt_utils"
+
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 )
@@ -23,7 +24,7 @@ func NewPublisher(id string) *Publisher {
 	opts.SetDefaultPublishHandler(DefaultPublishHandler)
 	opts.SetOnConnectHandler(OnConnectHandler)
 	opts.SetConnectionLostHandler(ConnectionLostHandler)
-	client := mqttutil.NewMQTTClient(id, config.Config, opts)
+	client := mqtt_utils.NewMQTTClient(id, config.Config, opts)
 	return &Publisher{
 		clientId: id,
 		Client:   client,

@@ -3,8 +3,8 @@ package mqtt_api
 import (
 	"dominant/broker"
 	"dominant/mq"
-	mqttutils "dominant/mqtt_util"
-	"dominant/mqtt_util/subscriber"
+	mqttutils "dominant/mqtt_utils"
+	"dominant/mqtt_utils/subscriber"
 	"encoding/json"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
