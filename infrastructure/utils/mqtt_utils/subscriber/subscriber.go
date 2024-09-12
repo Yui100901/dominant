@@ -1,8 +1,8 @@
 package subscriber
 
 import (
-	"dominant/config"
-	"dominant/mqtt_utils"
+	"dominant/infrastructure/config"
+	"dominant/infrastructure/utils/mqtt_utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 )

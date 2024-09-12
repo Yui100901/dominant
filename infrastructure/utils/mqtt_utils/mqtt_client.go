@@ -1,7 +1,7 @@
 package mqtt_utils
 
 import (
-	"dominant/config"
+	"dominant/infrastructure/config"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 )

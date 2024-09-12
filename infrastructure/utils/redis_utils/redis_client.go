@@ -1,7 +1,7 @@
 package redis_utils
 
 import (
-	"dominant/config"
+	"dominant/infrastructure/config"
 	"github.com/go-redis/redis/v8"
 	"time"
 )
