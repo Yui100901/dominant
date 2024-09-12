@@ -1,40 +1,19 @@
 package main
 
 import (
+	"dominant/authentication"
+	"dominant/config"
 	"fmt"
-	"unsafe"
+	"github.com/google/uuid"
 )
 
-//
-// @Author yfy2001
-// @Date 2024/7/5 16 21
-//
-
-type Programmer struct {
-	name     string
-	language string
-}
-
-func Add(a, b int64) int64 {
-	return a + b
-}
-
-func Sub(a, b int64) int64 {
-	return a - b
-}
-
 func main() {
-	p := &Programmer{"abc", "go"}
-	p1 := Programmer{"134", "c"}
-	fmt.Printf("%p\n", Add)
-	fmt.Printf("%p\n", Sub)
-
-	name := (*string)(unsafe.Pointer(p))
-	*name = "def"
-
-	lang := (*string)(unsafe.Pointer(uintptr(unsafe.Pointer(p)) + unsafe.Offsetof(p.language)))
-	*lang = "Golang"
-	//
-	fmt.Println(p)
-	fmt.Println(p1)
+	fmt.Println(uuid.NewString())
+	c := code.NewAuthentication(100)
+	fmt.Println(c)
+	// 使用配置
+	fmt.Printf("应用名称: %s\n", config.Config.App.Name)
+	fmt.Printf("应用版本: %s\n", config.Config.App.Version)
+	fmt.Printf("MQTT Config: %+v\n", config.Config.MQTT)
+	fmt.Printf("Redis Config: %+v\n", config.Config.Redis)
 }
