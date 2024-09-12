@@ -2,7 +2,7 @@ package main
 
 import (
 	"dominant/api/http_api"
-	"dominant/server"
+	"dominant/api/server"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
