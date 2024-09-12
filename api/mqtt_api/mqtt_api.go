@@ -1,10 +1,10 @@
 package mqtt_api
 
 import (
-	"dominant/broker"
-	"dominant/mq"
-	mqttutils "dominant/mqtt_utils"
-	"dominant/mqtt_utils/subscriber"
+	"dominant/domain/broker"
+	"dominant/infrastructure/messaging/mq"
+	"dominant/infrastructure/utils/mqtt_utils"
+	"dominant/infrastructure/utils/mqtt_utils/subscriber"
 	"encoding/json"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
@@ -21,7 +21,7 @@ var callback mqtt.MessageHandler = func(client mqtt.Client, mqttMsg mqtt.Message
 	payload := mqttMsg.Payload()
 	topic := mqttMsg.Topic()
 	log.Printf("Subscriber Received message from topic: %s\n", mqttMsg.Topic())
-	mqttMessage := new(mqttutils.MQTTMessage)
+	mqttMessage := new(mqtt_utils.MQTTMessage)
 	err := json.Unmarshal(payload, mqttMessage)
 	if err != nil {
 		log.Fatal(err)
