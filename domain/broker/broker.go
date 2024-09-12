@@ -2,8 +2,9 @@ package broker
 
 import (
 	"context"
-	"dominant/mq"
-	"dominant/redis_utils"
+	"dominant/domain/node"
+	"dominant/infrastructure/messaging/mq"
+	"dominant/infrastructure/utils/redis_utils"
 	"fmt"
 	"github.com/google/uuid"
 	"log"
@@ -17,20 +18,20 @@ import (
 // @Date 2024/7/3 13 49
 //
 
-type nodeMap map[string]*Node
+type nodeMap map[string]*node.Node
 type messageChanSlice []chan *mq.Message
 
 type Broker struct {
 	//OnlineNodes nodeMap
-	NodeMap map[string]*Node //所有节点
-	MainMQ  *mq.Queue        //全局主队列
+	NodeMap map[string]*node.Node //所有节点
+	MainMQ  *mq.Queue             //全局主队列
 	rwm     sync.RWMutex
 }
 
 func NewBroker() *Broker {
 	return &Broker{
 		//OnlineNodes: make(nodeMap),
-		NodeMap: make(map[string]*Node),
+		NodeMap: make(map[string]*node.Node),
 		MainMQ:  mq.NewQueue(),
 		rwm:     sync.RWMutex{},
 	}
@@ -98,7 +99,7 @@ func (b *Broker) Login(id, addr string, state []byte) string {
 	}
 	token := uuid.NewString()
 	//重新给节点分配token
-	n = NewNode(id, addr, token, state)
+	n = node.NewNode(id, addr, token, state)
 	n.RealtimeInfo = state
 	//存入全局节点表
 	b.NodeMap[id] = n
@@ -149,7 +150,7 @@ func (b *Broker) Unregister(id string) {
 }
 
 // GetNodeById 根据id获取一个节点
-func (b *Broker) GetNodeById(id string) *Node {
+func (b *Broker) GetNodeById(id string) *node.Node {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
 	n := b.NodeMap[id]
@@ -157,11 +158,11 @@ func (b *Broker) GetNodeById(id string) *Node {
 }
 
 // GetAliveNodeIDList 获取所有在线节点ID和节点详细信息
-func (b *Broker) GetAliveNodeIDList() ([]string, []Node) {
+func (b *Broker) GetAliveNodeIDList() ([]string, []node.Node) {
 	b.rwm.RLock()
 	defer b.rwm.RUnlock()
 	var onlineNodeIdList []string
-	var onlineNodeList []Node
+	var onlineNodeList []node.Node
 	for id, n := range b.NodeMap {
 		if n.IsAlive {
 			onlineNodeIdList = append(onlineNodeIdList, id)
