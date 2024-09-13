@@ -4,11 +4,11 @@ import (
 	"context"
 	"dominant/domain/node"
 	"dominant/infrastructure/messaging/mq"
-	"dominant/infrastructure/utils/redis_utils"
+	"dominant/infrastructure/utils/network/redis_utils"
+	"dominant/infrastructure/utils/rand_utils"
 	"fmt"
 	"github.com/google/uuid"
 	"log"
-	"math/rand"
 	"sync"
 	"time"
 )
@@ -57,18 +57,13 @@ func (b *Broker) Distribute() <-chan *mq.Message {
 				msg.ActualDstList = msg.PresetDstList
 			} else {
 				//当消息预设目的地为空时将随机分配消息目的地
-				dst := randomStringFromSlice(nodeIDs)
+				dst := rand_utils.RandomFromSlice[string](nodeIDs)
 				msg.ActualDstList = append(msg.ActualDstList, dst)
 			}
 			log.Println("Distribute:", msg.ActualDstList)
 			go b.Send(msg)
 		}
 	}
-}
-
-func randomStringFromSlice(slice []string) string {
-	rand.NewSource(time.Now().UnixNano()) // 设置随机数种子
-	return slice[rand.Intn(len(slice))]
 }
 
 // Send 消息发送
