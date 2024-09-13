@@ -1,4 +1,4 @@
-package code
+package authentication
 
 import (
 	"github.com/google/uuid"
@@ -14,7 +14,7 @@ type Authentication struct {
 	ID             string    `json:"id"`
 	NodeId         string    `json:"nodeId"`
 	CreateTime     time.Time `json:"createTime"`
-	ValidTime      int       `json:"validTime"`
+	ValidTime      int       `json:"validTime"` //有效时间，最小单位小时
 	IsActive       bool      `json:"isActive"`
 	ActiveTime     time.Time `json:"activeTime"`
 	ExpirationTime time.Time `json:"expirationTime"`
@@ -54,4 +54,10 @@ func (a *Authentication) Verify() bool {
 		return false
 	}
 	return true
+}
+
+// AdjustValidTime 调整有效期
+func (a *Authentication) AdjustValidTime(hours int) {
+	a.ValidTime += hours
+	a.ExpirationTime = a.ExpirationTime.Add(time.Duration(hours) * time.Hour)
 }

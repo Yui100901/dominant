@@ -1,6 +1,9 @@
 package node
 
-import "dominant/infrastructure/messaging/mq"
+import (
+	"dominant/domain/node/authentication"
+	"dominant/infrastructure/messaging/mq"
+)
 
 //
 // @Author yfy2001
@@ -15,6 +18,7 @@ type Node struct {
 	IsAlive   bool      //存活标记
 	AliveChan chan bool //心跳通道
 	//NodeType     string            //节点类型
+	Auth         *authentication.Authentication
 	TopicMap     map[string]string //节点订阅主题表
 	RealtimeInfo any               //实时数据
 }
@@ -28,6 +32,7 @@ func NewNode(id, addr, token string, info any) *Node {
 		Token:        token,
 		IsAlive:      true, //节点创建时默认存活状态
 		AliveChan:    make(chan bool),
+		Auth:         authentication.NewAuthentication(id, 0),
 		TopicMap:     make(map[string]string),
 		RealtimeInfo: info,
 	}
