@@ -22,6 +22,7 @@ func GetMessage(c *gin.Context) {
 	c.JSON(http.StatusOK, msg)
 }
 
+// Login 登录接口
 func Login(c *gin.Context) {
 	ipAddr := c.ClientIP()
 	body := make(map[string]any)
@@ -35,6 +36,7 @@ func Login(c *gin.Context) {
 	}
 }
 
+// Verify 验证接口
 func Verify(c *gin.Context) {
 	//ipAddr := c.ClientIP()
 	var cmd VerifyCommand
