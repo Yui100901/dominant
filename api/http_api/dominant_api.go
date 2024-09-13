@@ -25,7 +25,7 @@ func NewMessage(c *gin.Context) {
 	}
 	broker.GlobalBroker.MainMQ.Enqueue(msg)
 	fmt.Println(msg)
-	c.JSON(http.StatusOK, gin.H{"message": "Success!"})
+	c.JSON(http.StatusOK, server.SuccessResponse("success"))
 }
 
 func GetClientList(c *gin.Context) {
