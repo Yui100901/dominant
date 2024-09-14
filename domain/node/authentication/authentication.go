@@ -13,6 +13,7 @@ import (
 type Authentication struct {
 	ID             string    `json:"id"`
 	NodeId         string    `json:"nodeId"`
+	Token          string    `json:"token"`
 	CreateTime     time.Time `json:"createTime"`
 	ValidTime      int       `json:"validTime"` //有效时间，最小单位小时
 	IsActive       bool      `json:"isActive"`
@@ -45,15 +46,11 @@ func (a *Authentication) Active() {
 
 // Verify 验证激活状态
 func (a *Authentication) Verify() bool {
-	if !a.IsActive {
-		return false
-	}
 	currentTime := time.Now()
 	if currentTime.After(a.ExpirationTime) {
 		a.IsActive = false
-		return false
 	}
-	return true
+	return a.IsActive
 }
 
 // AdjustValidTime 调整有效期

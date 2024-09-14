@@ -12,8 +12,7 @@ import (
 
 type Node struct {
 	ID        string
-	Addr      string //节点地址
-	Token     string
+	Addr      string    //节点地址
 	MQ        *mq.Queue //节点队列
 	IsAlive   bool      //存活标记
 	AliveChan chan bool //心跳通道
@@ -23,13 +22,12 @@ type Node struct {
 	RealtimeInfo any               //实时数据
 }
 
-func NewNode(id, addr, token string, info any) *Node {
+func NewNode(id, addr string, info any) *Node {
 	//id := uuid.NewV4().String()
 	return &Node{
 		ID:           id,
 		Addr:         addr,
 		MQ:           mq.NewQueue(),
-		Token:        token,
 		IsAlive:      true, //节点创建时默认存活状态
 		AliveChan:    make(chan bool),
 		Auth:         authentication.NewAuthentication(id, 0),

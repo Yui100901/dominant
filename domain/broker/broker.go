@@ -94,12 +94,12 @@ func (b *Broker) Login(id, addr string, state []byte) string {
 	}
 	token := uuid.NewString()
 	//重新给节点分配token
-	n = node.NewNode(id, addr, token, state)
+	n = node.NewNode(id, addr, state)
 	n.RealtimeInfo = state
 	//存入全局节点表
 	b.NodeMap[id] = n
 	log.Println("登录id", id)
-	log.Printf("%v", b.NodeMap[id].Token)
+	log.Printf("%v", b.NodeMap[id].Auth.Token)
 	//启动保活协程
 	go b.keepAlive(id)
 	ctx := context.Background()
@@ -108,23 +108,29 @@ func (b *Broker) Login(id, addr string, state []byte) string {
 	return token
 }
 
-// Verify 节点在线验证
-func (b *Broker) Verify(id, token string, state []byte) bool {
+// AuthenticateNode 节点验证
+func (b *Broker) AuthenticateNode(id, addr, token string, state []byte) bool {
 	b.rwm.Lock()
 	defer b.rwm.Unlock()
 	n := b.NodeMap[id]
+	if token == "" {
+
+	}
 	if n == nil {
 		//节点未登录
-		log.Println("非法的节点id", id)
+		log.Println("创建匿名节点：", id)
+		n = node.NewNode(id, addr, state)
+		b.NodeMap[id] = n
+		go b.keepAlive(id)
 		return false
 	} else {
 		//id已经存在
 		if n.IsAlive {
 			//该节点存活，向目标节点发送保活消息
-			if n.Token == token {
+			if n.Auth.Token == token {
 				n.AliveChan <- true
 			} else {
-				log.Println("token过期")
+				log.Println("无token!")
 				return false
 			}
 		} else {
@@ -193,6 +199,7 @@ func (b *Broker) GetMessage(nodeId string) *mq.Message {
 // KeepAlive 保持在线
 func (b *Broker) keepAlive(id string) {
 	n := b.GetNodeById(id)
+	aliveTicker := time.NewTicker(60 * time.Second)
 	for {
 		select {
 		case alive := <-n.AliveChan:
@@ -203,10 +210,11 @@ func (b *Broker) keepAlive(id string) {
 				n.IsAlive = false
 				return
 			}
-		case <-time.After(time.Second * 60):
+		case <-aliveTicker.C:
 			log.Println(id, "超时退出！")
 			n.IsAlive = false
 			b.Unregister(id)
+			return
 		}
 	}
 }
