@@ -5,7 +5,7 @@ package http_api
 // @Date 2024/9/9 22 12
 //
 
-type VerifyCommand struct {
+type ConnectCommand struct {
 	ID    string `json:"id"`
 	Token string `json:"token"`
 }

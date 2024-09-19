@@ -39,7 +39,7 @@ func Login(c *gin.Context) {
 // Connect 连接接口
 func Connect(c *gin.Context) {
 	//ipAddr := c.ClientIP()
-	var cmd VerifyCommand
+	var cmd ConnectCommand
 	if err := c.ShouldBind(&cmd); err == nil {
 		//获取请求体中json数据
 		id := cmd.ID

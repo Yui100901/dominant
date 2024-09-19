@@ -118,7 +118,7 @@ func login() {
 
 func alive() {
 	url := fmt.Sprintf("%s/verify", BaseUrl)
-	cmd := http_api.VerifyCommand{
+	cmd := http_api.ConnectCommand{
 		ID:    ExecutorId,
 		Token: token,
 	}

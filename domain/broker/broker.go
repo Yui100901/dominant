@@ -112,37 +112,29 @@ func (b *Broker) Login(id, addr string, state []byte) string {
 func (b *Broker) AuthenticateNode(id, addr, token string, state []byte) bool {
 	b.rwm.Lock()
 	defer b.rwm.Unlock()
-	n := b.NodeMap[id]
-	if token == "" {
 
-	}
+	n := b.NodeMap[id]
 	if n == nil {
-		//节点未登录
-		log.Println("创建匿名节点：", id)
+		//节点未在线使该id节点上线
+		log.Println("创建节点：", id)
 		n = node.NewNode(id, addr, state)
 		b.NodeMap[id] = n
 		go b.keepAlive(id)
 		return false
-	} else {
-		//id已经存在
-		if n.IsAlive {
-			//该节点存活，向目标节点发送保活消息
-			if n.Auth.Token == token {
-				n.AliveChan <- true
-			} else {
-				log.Println("无token!")
-				return false
-			}
-		} else {
-			log.Println("请重新登录")
-			return false
-		}
-		n.RealtimeInfo = state
 	}
+
+	//刷新节点在线状态
+	n.AliveChan <- true
 	ctx := context.Background()
 	//刷新redis存储的最新状态
 	redis_utils.GlobalRedisClient.Set(ctx, n.ID, state, 60*time.Second)
-	return true
+
+	if n.Auth.Verify() {
+		//验证通过
+		return true
+	}
+
+	return false
 }
 
 // Unregister 取消某个id的节点在线状态
@@ -204,6 +196,7 @@ func (b *Broker) keepAlive(id string) {
 		select {
 		case alive := <-n.AliveChan:
 			if alive {
+				n.IsAlive = true
 				continue
 			} else {
 				//收到下线指令，退出保活协程
