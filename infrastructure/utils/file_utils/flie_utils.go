@@ -12,8 +12,9 @@ import (
 
 // TraverseDirFiles 遍历给定目录并返回文件路径列表
 // recursive 参数表明是否递归遍历子目录
-func TraverseDirFiles(dir string, recursive bool) ([]string, error) {
+func TraverseDirFiles(dir string, recursive bool) ([]string, []string, error) {
 	var files []string
+	var dirs []string
 
 	if recursive {
 		// 递归遍历目录
@@ -21,26 +22,31 @@ func TraverseDirFiles(dir string, recursive bool) ([]string, error) {
 			if err != nil {
 				return err
 			}
-			if !d.IsDir() {
+			if d.IsDir() {
+				dirs = append(dirs, path)
+			} else {
 				files = append(files, path)
 			}
 			return nil
 		})
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	} else {
 		// 非递归遍历目录
 		entries, err := os.ReadDir(dir)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		for _, entry := range entries {
-			if !entry.IsDir() {
-				files = append(files, filepath.Join(dir, entry.Name()))
+			fullPath := filepath.Join(dir, entry.Name())
+			if entry.IsDir() {
+				dirs = append(dirs, fullPath)
+			} else {
+				files = append(files, fullPath)
 			}
 		}
 	}
 
-	return files, nil
+	return dirs, files, nil
 }

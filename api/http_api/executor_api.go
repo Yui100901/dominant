@@ -36,15 +36,15 @@ func Login(c *gin.Context) {
 	}
 }
 
-// Verify 验证接口
-func Verify(c *gin.Context) {
+// Connect 连接接口
+func Connect(c *gin.Context) {
 	//ipAddr := c.ClientIP()
 	var cmd VerifyCommand
 	if err := c.ShouldBind(&cmd); err == nil {
 		//获取请求体中json数据
 		id := cmd.ID
 		token := cmd.Token
-		flag := broker.GlobalBroker.Verify(id, token, []byte("Verify test"))
+		flag := broker.GlobalBroker.AuthenticateNode(id, "", token, []byte("Connect test"))
 		msg := mq.NewMessage("", "", "Server", []string{id}, flag)
 		c.JSON(http.StatusOK, msg)
 	}

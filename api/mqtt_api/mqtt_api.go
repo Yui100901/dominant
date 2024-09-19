@@ -28,7 +28,7 @@ var callback mqtt.MessageHandler = func(client mqtt.Client, mqttMsg mqtt.Message
 		log.Fatal(err)
 	}
 	msg := mq.NewMessage(topic, "status", mqttMessage.NodeId, []string{topic}, mqttMessage)
-	broker.GlobalBroker.Verify(mqttMessage.NodeId, msg.Topic, payload)
+	broker.GlobalBroker.AuthenticateNode(mqttMessage.NodeId, "", msg.Topic, payload)
 }
 
 func init() {

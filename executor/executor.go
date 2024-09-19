@@ -99,7 +99,6 @@ func postFeedback(m *mq.Message) {
 
 func login() {
 	url := fmt.Sprintf("%s/login", BaseUrl)
-
 	data := make(map[string]string)
 	data["id"] = ExecutorId
 	bytesData, err := json.Marshal(data)
