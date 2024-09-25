@@ -3,12 +3,12 @@ package mqtt_api
 import (
 	"dominant/domain/broker"
 	"dominant/infrastructure/messaging/mq"
+	"dominant/infrastructure/utils/log_utils"
 	"dominant/infrastructure/utils/network/mqtt_utils"
 	"dominant/infrastructure/utils/network/mqtt_utils/subscriber"
 
 	"encoding/json"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"log"
 )
 
 //
@@ -21,11 +21,11 @@ var s *subscriber.Subscriber
 var callback mqtt.MessageHandler = func(client mqtt.Client, mqttMsg mqtt.Message) {
 	payload := mqttMsg.Payload()
 	topic := mqttMsg.Topic()
-	log.Printf("Subscriber Received message from topic: %s\n", mqttMsg.Topic())
+	log_utils.Info.Printf("Subscriber Received message from topic: %s\n", mqttMsg.Topic())
 	mqttMessage := new(mqtt_utils.MQTTMessage)
 	err := json.Unmarshal(payload, mqttMessage)
 	if err != nil {
-		log.Fatal(err)
+		log_utils.Error.Fatal(err)
 	}
 	msg := mq.NewMessage(topic, "status", mqttMessage.NodeId, []string{topic}, mqttMessage)
 	broker.GlobalBroker.AuthenticateNode(mqttMessage.NodeId, "", msg.Topic, payload)

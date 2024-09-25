@@ -4,8 +4,8 @@ import (
 	"dominant/api/server"
 	"dominant/domain/broker"
 	"dominant/infrastructure/messaging/mq"
+	"dominant/infrastructure/utils/log_utils"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -24,7 +24,7 @@ func NewMessage(c *gin.Context) {
 		return
 	}
 	broker.GlobalBroker.MainMQ.Enqueue(msg)
-	fmt.Println(msg)
+	log_utils.Info.Println(msg)
 	c.JSON(http.StatusOK, server.SuccessResponse("success"))
 }
 
@@ -54,4 +54,8 @@ func GetNodeStatusList(c *gin.Context) {
 		messageList = append(messageList, mqttMessage)
 	}
 	c.JSON(http.StatusOK, msgList)
+}
+
+func NewNodeWithAuth(c *gin.Context) {
+
 }

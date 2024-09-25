@@ -3,7 +3,7 @@ package http_api
 import (
 	"dominant/domain/broker"
 	"dominant/infrastructure/messaging/mq"
-	"fmt"
+	"dominant/infrastructure/utils/log_utils"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -17,7 +17,7 @@ import (
 func GetMessage(c *gin.Context) {
 	ip := c.ClientIP()
 	nodeId := c.Query("nodeId")
-	fmt.Println(ip)
+	log_utils.Info.Println(ip)
 	msg := broker.GlobalBroker.GetMessage(nodeId)
 	c.JSON(http.StatusOK, msg)
 }

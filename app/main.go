@@ -3,9 +3,9 @@ package main
 import (
 	"dominant/api/http_api"
 	"dominant/api/server"
+	"dominant/infrastructure/utils/log_utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 	r.POST("/connect", http_api.Connect)
 	err := r.Run(fmt.Sprintf(":%s", server.Port))
 	if err != nil {
-		log.Fatal(err.Error())
+		log_utils.Error.Fatal(err.Error())
 		return
 	}
 }

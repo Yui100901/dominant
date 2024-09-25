@@ -1,9 +1,9 @@
 package server
 
 import (
+	"dominant/infrastructure/utils/log_utils"
 	"encoding/json"
 	"github.com/gorilla/websocket"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -31,7 +31,7 @@ type WebSocket struct {
 func NewWebSocket(w http.ResponseWriter, r *http.Request) *WebSocket {
 	conn, err := WSServer.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		log_utils.Error.Println(err)
 		return nil
 	}
 	interval := 1000
@@ -47,13 +47,13 @@ func (ws *WebSocket) OnMessage(handler func([]byte)) {
 	for {
 		_, message, err := ws.Conn.ReadMessage()
 		if err != nil {
-			log.Println("Websocket Read ERROR:", err)
+			log_utils.Error.Println("Websocket Read ERROR:", err)
 			return
 		}
 		if handler != nil {
 			handler(message)
 		}
-		log.Printf("Websocket Receive: %s", message)
+		log_utils.Info.Printf("Websocket Receive: %s", message)
 	}
 }
 
@@ -68,7 +68,7 @@ func (ws *WebSocket) PushMessage(data func() []any) {
 			err := ws.Conn.WriteMessage(websocket.TextMessage, payload)
 			ws.mu.Unlock()
 			if err != nil {
-				log.Println("Websocket Write ERROR:", err)
+				log_utils.Error.Println("Websocket Write ERROR:", err)
 				return
 			}
 		}

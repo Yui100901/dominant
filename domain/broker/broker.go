@@ -4,11 +4,10 @@ import (
 	"context"
 	"dominant/domain/node"
 	"dominant/infrastructure/messaging/mq"
+	"dominant/infrastructure/utils/log_utils"
 	"dominant/infrastructure/utils/network/redis_utils"
 	"dominant/infrastructure/utils/rand_utils"
-	"fmt"
 	"github.com/google/uuid"
-	"log"
 	"sync"
 	"time"
 )
@@ -68,7 +67,7 @@ func (b *Broker) Distribute() <-chan *mq.Message {
 				dst := rand_utils.RandomFromSlice[string](nodeIDs)
 				msg.ActualDstList = append(msg.ActualDstList, dst)
 			}
-			log.Println("Distribute:", msg.ActualDstList)
+			log_utils.Info.Println("Distribute:", msg.ActualDstList)
 			go b.Send(msg)
 		}
 	}
@@ -104,8 +103,8 @@ func (b *Broker) Login(id, addr string, state []byte) string {
 	n.RealtimeInfo = state
 	//存入全局节点表
 	b.NodeMap[id] = n
-	log.Println("登录id", id)
-	log.Printf("%v", b.NodeMap[id].Auth.Token)
+	log_utils.Info.Println("登录id", id)
+	log_utils.Info.Printf("%v", b.NodeMap[id].Auth.Token)
 	//启动保活协程
 	go b.keepAlive(id)
 	ctx := context.Background()
@@ -122,7 +121,7 @@ func (b *Broker) AuthenticateNode(id, addr, token string, state []byte) bool {
 	n := b.NodeMap[id]
 	if n == nil {
 		//节点未在线使该id节点上线
-		log.Println("创建节点：", id)
+		log_utils.Info.Println("创建节点：", id)
 		n = node.NewNode(id, addr, state)
 		b.NodeMap[id] = n
 		go b.keepAlive(id)
@@ -166,11 +165,11 @@ func (b *Broker) GetAliveNodeIDList() ([]string, []node.Node) {
 // GetAliveNodeMessage 获取所有节点最新状态消息
 func (b *Broker) GetAliveNodeMessage() []any {
 	idList, _ := b.GetAliveNodeIDList()
-	fmt.Println("Online Node List:", idList)
+	log_utils.Info.Println("Online Node List:", idList)
 	ctx := context.Background()
 	messageList, err := redis_utils.GlobalRedisClient.MGet(ctx, idList...).Result()
 	if err != nil {
-		fmt.Println("Get Alive Node Message Error:", err)
+		log_utils.Error.Println("Get Alive Node Message Error:", err)
 	}
 	return messageList
 }
@@ -198,7 +197,7 @@ func (b *Broker) keepAlive(id string) {
 				return
 			}
 		case <-aliveTicker.C:
-			log.Println(id, "超时退出！")
+			log_utils.Info.Println(id, "超时退出！")
 			n.IsAlive = false
 			b.Unregister(id)
 			return

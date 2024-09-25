@@ -1,9 +1,9 @@
 package config
 
 import (
+	"dominant/infrastructure/utils/log_utils"
 	"fmt"
 	"github.com/spf13/viper"
-	"log"
 )
 
 //
@@ -51,11 +51,11 @@ func init() {
 
 	// 读取配置文件
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("无法读取配置文件: %v", err)
+		log_utils.Error.Fatalf("无法读取配置文件: %v", err)
 	}
 
 	// 解析配置文件到 Configuration 结构体
 	if err := viper.Unmarshal(&Config); err != nil {
-		log.Fatalf("无法解析配置文件: %v", err)
+		log_utils.Error.Fatalf("无法解析配置文件: %v", err)
 	}
 }

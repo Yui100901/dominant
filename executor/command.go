@@ -1,8 +1,8 @@
 package main
 
 import (
+	"dominant/infrastructure/utils/log_utils"
 	"fmt"
-	"log"
 	"os/exec"
 	"syscall"
 )
@@ -39,7 +39,7 @@ func (c *Command) Exec() {
 			c.result = err.Error()
 		}
 		c.result = string(res)
-		log.Printf(`
+		log_utils.Info.Printf(`
 Execute Command:
 %s
 Command Result:

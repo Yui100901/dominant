@@ -5,11 +5,11 @@ import (
 	"dominant/api/http_api"
 	"dominant/api/server"
 	"dominant/infrastructure/messaging/mq"
+	"dominant/infrastructure/utils/log_utils"
 
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
@@ -41,10 +41,10 @@ func init() {
 }
 
 func main() {
-	log.Println("登录id：", ExecutorId)
-	log.Println("登录token：", token)
+	log_utils.Info.Println("登录id：", ExecutorId)
+	log_utils.Info.Println("登录token：", token)
 	if token == "" {
-		log.Println("登录失败！")
+		log_utils.Info.Println("登录失败！")
 		return
 	}
 	go func() {
@@ -113,7 +113,7 @@ func login() {
 	}
 	content, _ := msg.Content.(string)
 	token = content
-	fmt.Println(msg.Content)
+	log_utils.Info.Println(msg.Content)
 }
 
 func alive() {
@@ -131,11 +131,11 @@ func alive() {
 	err = json.Unmarshal(body, msg)
 	success, _ := msg.Content.(bool)
 	if !success {
-		log.Println("验证失败！")
+		log_utils.Info.Println("验证失败！")
 		exitChan <- true
 	}
 	if err != nil {
 		return
 	}
-	fmt.Println(msg.Content)
+	log_utils.Info.Println(msg.Content)
 }

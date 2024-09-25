@@ -2,8 +2,8 @@ package mqtt_utils
 
 import (
 	"dominant/infrastructure/config"
+	"dominant/infrastructure/utils/log_utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"log"
 )
 
 //
@@ -28,7 +28,7 @@ func NewMQTTClient(clientID string, config config.Configuration, opts *mqtt.Clie
 	opts.SetPassword(config.MQTT.Password)
 	client := mqtt.NewClient(opts)
 	if conn := client.Connect(); conn.Wait() && conn.Error() != nil {
-		log.Println(conn.Error())
+		log_utils.Error.Println(conn.Error())
 		return nil
 	}
 	return client

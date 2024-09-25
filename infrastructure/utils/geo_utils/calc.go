@@ -1,7 +1,7 @@
 package geo
 
 import (
-	"log"
+	"dominant/infrastructure/utils/log_utils"
 	"math"
 )
 
@@ -24,11 +24,11 @@ type Offset struct {
 // 方向角正北为0（以度为单位）
 // 移动的距离（以米为单位）
 func ExecOffset(p *Coordinate, cf *CoordinateOffset) *Coordinate {
-	log.Println("当前位置：", p.Longitude, p.Latitude)
+	log_utils.Info.Println("当前位置：", p.Longitude, p.Latitude)
 
 	newLongitude := p.Longitude + cf.LongitudeOffset
 	newLatitude := p.Latitude + cf.LatitudeOffset
-	log.Println("偏移位置：", newLongitude, newLatitude)
+	log_utils.Info.Println("偏移位置：", newLongitude, newLatitude)
 	return NewCoordinate(newLongitude, newLatitude)
 }
 
