@@ -37,6 +37,14 @@ func NewBroker() *Broker {
 	}
 }
 
+// GetNodeById 根据id获取一个节点
+func (b *Broker) GetNodeById(id string) *node.Node {
+	b.rwm.RLock()
+	defer b.rwm.RUnlock()
+	n := b.NodeMap[id]
+	return n
+}
+
 // Distribute 消息分发实现，根据预设目的地设置实际目的地并进行分发
 func (b *Broker) Distribute() <-chan *mq.Message {
 	for {
@@ -82,9 +90,7 @@ func (b *Broker) Send(msg *mq.Message) {
 
 // Login 节点登录
 func (b *Broker) Login(id, addr string, state []byte) string {
-	b.rwm.Lock()
-	defer b.rwm.Unlock()
-	n := b.NodeMap[id]
+	n := b.GetNodeById(id)
 	if n != nil {
 		//id已经存在
 		if n.IsAlive {
@@ -142,14 +148,6 @@ func (b *Broker) Unregister(id string) {
 	b.NodeMap[id].AliveChan <- false
 }
 
-// GetNodeById 根据id获取一个节点
-func (b *Broker) GetNodeById(id string) *node.Node {
-	b.rwm.RLock()
-	defer b.rwm.RUnlock()
-	n := b.NodeMap[id]
-	return n
-}
-
 // GetAliveNodeIDList 获取所有在线节点ID和节点详细信息
 func (b *Broker) GetAliveNodeIDList() ([]string, []node.Node) {
 	b.rwm.RLock()
@@ -179,12 +177,8 @@ func (b *Broker) GetAliveNodeMessage() []any {
 
 // GetMessage 根据节点id定位一则消息
 func (b *Broker) GetMessage(nodeId string) *mq.Message {
-	b.rwm.RLock()
-	defer b.rwm.RUnlock()
-	msg := &mq.Message{}
-	if n, ok := b.NodeMap[nodeId]; ok {
-		msg = n.MQ.Dequeue()
-	}
+	n := b.GetNodeById(nodeId)
+	msg := n.MQ.Dequeue()
 	return msg
 }
 
