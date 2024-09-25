@@ -22,7 +22,7 @@ func main() {
 	//执行器相关接口
 	r.GET("/getMessage", http_api.GetMessage)
 	r.POST("/login", http_api.Login)
-	r.POST("/verify", http_api.Connect)
+	r.POST("/connect", http_api.Connect)
 	err := r.Run(fmt.Sprintf(":%s", server.Port))
 	if err != nil {
 		log.Fatal(err.Error())
