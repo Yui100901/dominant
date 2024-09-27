@@ -6,6 +6,7 @@ import (
 	"dominant/api/server"
 	"dominant/infrastructure/messaging/mq"
 	"dominant/infrastructure/utils/log_utils"
+	"dominant/infrastructure/utils/network/http_utils"
 
 	"encoding/json"
 	"fmt"
@@ -117,22 +118,20 @@ func login() {
 }
 
 func alive() {
-	url := fmt.Sprintf("%s/verify", BaseUrl)
+	url := fmt.Sprintf("%s/connect", BaseUrl)
 	cmd := http_api.ConnectCommand{
 		ID:    ExecutorId,
 		Token: token,
 	}
-	bytesData, err := json.Marshal(cmd)
-	req, _ := http.NewRequest("POST", url, bytes.NewReader(bytesData))
-	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
-	resp, err := client.Do(req)
-	body, err := io.ReadAll(resp.Body)
+	body, err := http_utils.PostByJson(url, cmd)
+	if err != nil {
+		return
+	}
 	msg := &mq.Message{}
 	err = json.Unmarshal(body, msg)
 	success, _ := msg.Content.(bool)
 	if !success {
 		log_utils.Info.Println("验证失败！")
-		exitChan <- true
 	}
 	if err != nil {
 		return
