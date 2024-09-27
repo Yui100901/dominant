@@ -1,4 +1,4 @@
-package http_utils
+package main
 
 import (
 	"bytes"
@@ -24,11 +24,15 @@ func GetByQuery(apiUrl string, reqData any) ([]byte, error) {
 		log_utils.Error.Println("解析URL错误:", err)
 		return nil, err
 	}
-	query := reqUrl.Query()
-	for key, value := range reqData.(map[string]string) {
-		query.Set(key, value)
+
+	// 检查请求数据是否为空
+	if reqData != nil {
+		query := reqUrl.Query()
+		for key, value := range reqData.(map[string]string) {
+			query.Set(key, value)
+		}
+		reqUrl.RawQuery = query.Encode()
 	}
-	reqUrl.RawQuery = query.Encode()
 
 	// 创建一个新的GET请求
 	req, err := http.NewRequest(http.MethodGet, reqUrl.String(), nil)
@@ -43,11 +47,17 @@ func GetByQuery(apiUrl string, reqData any) ([]byte, error) {
 
 // PostByJson 发送一个带有JSON数据的HTTP POST请求到指定的URL
 func PostByJson(apiUrl string, reqData any) ([]byte, error) {
-	// 将请求数据序列化为JSON
-	requestBody, err := json.Marshal(reqData)
-	if err != nil {
-		log_utils.Error.Println("序列化错误:", err)
-		return nil, err
+	var requestBody []byte
+	var err error
+
+	// 检查请求数据是否为空
+	if reqData != nil {
+		// 将请求数据序列化为JSON
+		requestBody, err = json.Marshal(reqData)
+		if err != nil {
+			log_utils.Error.Println("序列化错误:", err)
+			return nil, err
+		}
 	}
 
 	// 创建一个带有JSON数据的POST请求
@@ -64,12 +74,17 @@ func PostByJson(apiUrl string, reqData any) ([]byte, error) {
 
 // PostByForm 发送一个带有表单数据的HTTP POST请求到指定的URL
 func PostByForm(apiUrl string, reqData any) ([]byte, error) {
-	// 将请求数据编码为表单数据
-	formData := url.Values{}
-	for key, value := range reqData.(map[string]string) {
-		formData.Set(key, value)
+	var requestBody []byte
+
+	// 检查请求数据是否为空
+	if reqData != nil {
+		// 将请求数据编码为表单数据
+		formData := url.Values{}
+		for key, value := range reqData.(map[string]string) {
+			formData.Set(key, value)
+		}
+		requestBody = []byte(formData.Encode())
 	}
-	requestBody := []byte(formData.Encode())
 
 	// 创建一个带有表单数据的POST请求
 	req, err := http.NewRequest(http.MethodPost, apiUrl, bytes.NewBuffer(requestBody))
