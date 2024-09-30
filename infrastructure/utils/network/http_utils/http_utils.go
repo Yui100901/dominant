@@ -1,4 +1,4 @@
-package main
+package http_utils
 
 import (
 	"bytes"
@@ -17,7 +17,7 @@ import (
 var client = &http.Client{}
 
 // GetByQuery 发送一个HTTP GET请求到指定的URL，并附带查询参数
-func GetByQuery(apiUrl string, reqData any) ([]byte, error) {
+func GetByQuery(apiUrl string, reqData map[string]string) ([]byte, error) {
 	// 解析URL并添加查询参数
 	reqUrl, err := url.Parse(apiUrl)
 	if err != nil {
@@ -28,7 +28,7 @@ func GetByQuery(apiUrl string, reqData any) ([]byte, error) {
 	// 检查请求数据是否为空
 	if reqData != nil {
 		query := reqUrl.Query()
-		for key, value := range reqData.(map[string]string) {
+		for key, value := range reqData {
 			query.Set(key, value)
 		}
 		reqUrl.RawQuery = query.Encode()
@@ -73,14 +73,14 @@ func PostByJson(apiUrl string, reqData any) ([]byte, error) {
 }
 
 // PostByForm 发送一个带有表单数据的HTTP POST请求到指定的URL
-func PostByForm(apiUrl string, reqData any) ([]byte, error) {
+func PostByForm(apiUrl string, reqData map[string]string) ([]byte, error) {
 	var requestBody []byte
 
 	// 检查请求数据是否为空
 	if reqData != nil {
 		// 将请求数据编码为表单数据
 		formData := url.Values{}
-		for key, value := range reqData.(map[string]string) {
+		for key, value := range reqData {
 			formData.Set(key, value)
 		}
 		requestBody = []byte(formData.Encode())
