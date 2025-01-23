@@ -1,7 +1,9 @@
 package config
 
 import (
-	"dominant/infrastructure/utils/log_utils"
+	"github.com/Yui100901/MyGo/log_utils"
+	"github.com/Yui100901/MyGo/network/mqtt_utils"
+
 	"fmt"
 	"github.com/spf13/viper"
 )
@@ -12,20 +14,18 @@ import (
 //
 
 type Configuration struct {
-	App   AppConfiguration   `yaml:"app"`
-	MQTT  MQTTConfiguration  `yaml:"mqtt"`
+	App  AppConfiguration `yaml:"app"`
+	MQTT struct {
+		Ship mqtt_utils.MQTTConfiguration `yaml:"ship"`
+		Dog  mqtt_utils.MQTTConfiguration `yaml:"dog"`
+		Node mqtt_utils.MQTTConfiguration `yaml:"node"`
+	} `yaml:"mqtt"`
 	Redis RedisConfiguration `yaml:"redis"`
 }
 
 type AppConfiguration struct {
 	Name    string `yaml:"name"`
 	Version string `yaml:"version"`
-}
-
-type MQTTConfiguration struct {
-	URL      string `yaml:"url"`
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
 }
 
 type RedisConfiguration struct {
@@ -43,7 +43,7 @@ var Config Configuration
 
 func init() {
 	// 获取环境变量
-	env := "prod" // 默认环境为 dev
+	env := "dev" // 默认环境为 dev
 
 	// 设置配置文件名和路径
 	viper.SetConfigName(fmt.Sprintf("config-%s", env))
