@@ -10,7 +10,7 @@ type Coordinate struct {
 	Longitude        float64 `json:"longitude"`        //经度
 	Latitude         float64 `json:"latitude"`         //纬度
 	LongitudeRadians float64 `json:"longitudeRadians"` //弧度制经度
-	LatitudeRadians  float64 `json:"latitude_radians"` //弧度制纬度
+	LatitudeRadians  float64 `json:"latitudeRadians"`  //弧度制纬度
 }
 
 func NewCoordinate(longitude, latitude float64) *Coordinate {
@@ -19,6 +19,19 @@ func NewCoordinate(longitude, latitude float64) *Coordinate {
 		Latitude:         latitude,
 		LongitudeRadians: DegreeToRadians(longitude),
 		LatitudeRadians:  DegreeToRadians(latitude),
+	}
+}
+
+// AzimuthOffset 方位偏移
+type AzimuthOffset struct {
+	Azimuth  float64 `json:"azimuth"`  //方位角
+	Distance float64 `json:"distance"` //偏移距离
+}
+
+func NewAzimuthOffset(azimuth, distance float64) *AzimuthOffset {
+	return &AzimuthOffset{
+		Azimuth:  azimuth,
+		Distance: distance,
 	}
 }
 

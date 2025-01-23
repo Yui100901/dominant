@@ -1,7 +1,7 @@
 package geo
 
 import (
-	"dominant/infrastructure/utils/log_utils"
+	"github.com/Yui100901/MyGo/log_utils"
 	"math"
 )
 
@@ -15,11 +15,6 @@ import (
 // EarthRadius 地球平均半径
 const EarthRadius = 6371_393
 
-type Offset struct {
-	Azimuth  float64
-	Distance float64
-}
-
 // ExecOffset 传入点p
 // 方向角正北为0（以度为单位）
 // 移动的距离（以米为单位）
@@ -32,7 +27,8 @@ func ExecOffset(p *Coordinate, cf *CoordinateOffset) *Coordinate {
 	return NewCoordinate(newLongitude, newLatitude)
 }
 
-func CalcCoordinateOffset(c *Coordinate, of *Offset) *CoordinateOffset {
+// CalcCoordinateOffset 计算坐标偏移
+func CalcCoordinateOffset(c *Coordinate, of *AzimuthOffset) *CoordinateOffset {
 	// 方向角度转换为弧度
 	azimuthRadians := DegreeToRadians(of.Azimuth)
 	//纬度转换成弧度
@@ -55,10 +51,12 @@ func CalcCoordinateOffset(c *Coordinate, of *Offset) *CoordinateOffset {
 
 }
 
+// DegreeToRadians 角度转弧度
 func DegreeToRadians(degree float64) float64 {
 	return degree * math.Pi / 180
 }
 
+// RadiansToDegree 弧度转角度
 func RadiansToDegree(radians float64) float64 {
 	return radians * 180 / math.Pi
 }
