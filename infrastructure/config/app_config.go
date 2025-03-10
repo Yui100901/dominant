@@ -24,6 +24,7 @@ type Configuration struct {
 }
 
 type AppConfiguration struct {
+	Port    string `yaml:"port"`
 	Name    string `yaml:"name"`
 	Version string `yaml:"version"`
 }
