@@ -5,6 +5,7 @@ import (
 	"github.com/Yui100901/MyGo/concurrent"
 	"github.com/Yui100901/MyGo/network/http_utils"
 	"github.com/Yui100901/MyGo/network/mqtt_utils"
+	"time"
 )
 
 //
@@ -12,44 +13,52 @@ import (
 // @Date 2025/1/8 20 10
 //
 
-type Receiver interface {
-	Receive()
+type Accessor struct {
+	ID         string
+	MqttClient *mqtt_utils.MQTTClient
+	HttpClient *http_utils.HTTPClient
 }
 
-type Sender interface {
-	HTTPSender
-	MQTTSender
+func (c *Accessor) MQTTReceive() {
+	c.MqttClient.SubscribeDefault()
 }
 
-type HTTPSender interface {
-	HTTPSend(r *http_utils.HTTPRequest) ([]byte, error)
+func (c *Accessor) MQTTSend(r *mqtt_utils.MQTTPublishRequest) ([]byte, error) {
+	return c.MqttClient.Publish(r)
 }
 
-type MQTTSender interface {
-	MQTTSend(r *mqtt_utils.MQTTPublishRequest) ([]byte, error)
+func (c *Accessor) HTTPReceive(r *http_utils.HTTPRequest, duration time.Duration) {
+	for {
+		c.HttpClient.SendRequest(r)
+		time.Sleep(duration)
+	}
 }
 
-var SenderMap *concurrent.SafeMap[string, Sender]
+func (c *Accessor) HTTPSend(r *http_utils.HTTPRequest) ([]byte, error) {
+	return c.HttpClient.SendRequest(r)
+}
+
+var AccessorMap *concurrent.SafeMap[string, *Accessor]
 
 func init() {
-	SenderMap = concurrent.NewSafeMap[string, Sender](32)
+	AccessorMap = concurrent.NewSafeMap[string, *Accessor](32)
 }
 
 func Send(r *NodeRequest) ([]byte, error) {
-	sender, _ := SenderMap.Get(r.NodeId)
+	accessor, _ := AccessorMap.Get(r.NodeId)
 	switch r.Protocol {
 	case "HTTP":
-		return sender.HTTPSend(r.HTTPRequest)
+		return accessor.HTTPSend(r.HTTPRequest)
 	case "MQTT":
-		return sender.MQTTSend(r.MQTTRequest)
+		return accessor.MQTTSend(r.MQTTRequest)
 	default:
 		return nil, errors.New("not supported protocol")
 	}
 }
 
 type NodeRequest struct {
-	NodeId      string //节点id
-	Protocol    string //协议
-	HTTPRequest *http_utils.HTTPRequest
+	NodeId      string                         //节点id
+	Protocol    string                         //协议
+	HTTPRequest *http_utils.HTTPRequest        //HTTP请求
 	MQTTRequest *mqtt_utils.MQTTPublishRequest //MQTT的请求
 }
