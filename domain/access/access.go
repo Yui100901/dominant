@@ -5,7 +5,6 @@ import (
 	"github.com/Yui100901/MyGo/concurrent"
 	"github.com/Yui100901/MyGo/network/http_utils"
 	"github.com/Yui100901/MyGo/network/mqtt_utils"
-	"time"
 )
 
 //
@@ -19,19 +18,8 @@ type Accessor struct {
 	HttpClient *http_utils.HTTPClient
 }
 
-func (c *Accessor) MQTTReceive() {
-	c.MqttClient.SubscribeDefault()
-}
-
 func (c *Accessor) MQTTSend(r *mqtt_utils.MQTTPublishRequest) ([]byte, error) {
 	return c.MqttClient.Publish(r)
-}
-
-func (c *Accessor) HTTPReceive(r *http_utils.HTTPRequest, duration time.Duration) {
-	for {
-		c.HttpClient.SendRequest(r)
-		time.Sleep(duration)
-	}
 }
 
 func (c *Accessor) HTTPSend(r *http_utils.HTTPRequest) ([]byte, error) {
