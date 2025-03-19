@@ -1,29 +1,19 @@
 package main
 
 import (
-	"dominant/api/http_api"
-	"dominant/api/server"
-	"dominant/infrastructure/utils/log_utils"
+	"dominant/api"
+	_ "dominant/domain/access"
+	"dominant/infrastructure/config"
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"github.com/Yui100901/MyGo/log_utils"
 )
 
 func main() {
-	r := server.NewServer()
-	//创建一则新消息
-	r.POST("/newMessage", http_api.NewMessage)
-	r.GET("/getClientList", http_api.GetClientList)
-	//获取节点状态
-	r.GET("/getNodeStatusList", http_api.GetNodeStatusList)
-	//获取节点状态-WebSocket
-	r.GET("/wsGetNodeStatusList", func(c *gin.Context) {
-		http_api.ServeWebSocket(c.Writer, c.Request)
-	})
-	//执行器相关接口
-	r.GET("/getMessage", http_api.GetMessage)
-	r.POST("/login", http_api.Login)
-	r.POST("/connect", http_api.Connect)
-	err := r.Run(fmt.Sprintf(":%s", server.Port))
+	api.AddTelemetryApi()
+	api.AddShipApi()
+	api.AddDogControlApi()
+	api.AddDogDeviceApi()
+	err := api.WebEngine.Run(fmt.Sprintf(":%s", config.Config.App.Port))
 	if err != nil {
 		log_utils.Error.Fatal(err.Error())
 		return
