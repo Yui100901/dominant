@@ -18,7 +18,6 @@ type Configuration struct {
 	MQTT struct {
 		Ship mqtt_utils.MQTTConfiguration `yaml:"ship"`
 		Dog  mqtt_utils.MQTTConfiguration `yaml:"dog"`
-		Node mqtt_utils.MQTTConfiguration `yaml:"node"`
 	} `yaml:"mqtt"`
 	Redis RedisConfiguration `yaml:"redis"`
 }
@@ -48,7 +47,7 @@ func init() {
 
 	// 设置配置文件名和路径
 	viper.SetConfigName(fmt.Sprintf("config-%s", env))
-	viper.AddConfigPath("./infrastructure/config")
+	viper.AddConfigPath(".")
 
 	// 读取配置文件
 	if err := viper.ReadInConfig(); err != nil {
