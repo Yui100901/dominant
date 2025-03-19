@@ -47,5 +47,5 @@ type Status struct {
 
 func init() {
 	deviceVideoLinkMap = make(map[string]string)
-	deviceVideoLinkMap["9dd4299f15f74ffb8d52a39ffc1d2dc7"] = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+	deviceVideoLinkMap["9dd4299f15f74ffb8d52a39ffc1d2dc7"] = "http://liveplay2.orca-tech.cn/live/r91_0.flv"
 }
