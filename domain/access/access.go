@@ -2,7 +2,7 @@ package access
 
 import (
 	"errors"
-	"github.com/Yui100901/MyGo/concurrent"
+	"github.com/Yui100901/MyGo/concurrency"
 	"github.com/Yui100901/MyGo/network/http_utils"
 	"github.com/Yui100901/MyGo/network/mqtt_utils"
 )
@@ -23,17 +23,20 @@ func (c *Accessor) MQTTSend(r *mqtt_utils.MQTTPublishRequest) ([]byte, error) {
 }
 
 func (c *Accessor) HTTPSend(r *http_utils.HTTPRequest) ([]byte, error) {
-	return c.HttpClient.SendRequest(r)
+	return c.HttpClient.GetResponseData(r)
 }
 
-var AccessorMap *concurrent.SafeMap[string, *Accessor]
+var AccessorMap *concurrency.SafeMap[string, *Accessor]
 
 func init() {
-	AccessorMap = concurrent.NewSafeMap[string, *Accessor](32)
+	AccessorMap = concurrency.NewSafeMap[string, *Accessor](32)
 }
 
 func Send(r *NodeRequest) ([]byte, error) {
-	accessor, _ := AccessorMap.Get(r.NodeId)
+	accessor, ok := AccessorMap.Get(r.NodeId)
+	if !ok {
+		return nil, errors.New("accessor not found")
+	}
 	switch r.Protocol {
 	case "HTTP":
 		return accessor.HTTPSend(r.HTTPRequest)
