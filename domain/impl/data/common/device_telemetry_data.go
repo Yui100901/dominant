@@ -1,9 +1,5 @@
 package common
 
-import (
-	"github.com/google/uuid"
-)
-
 //
 // @Author yfy2001
 // @Date 2025/1/21 14 10
@@ -30,9 +26,8 @@ type DeviceTelemetryData struct {
 }
 
 func NewDeviceTelemetryData(device *Device, telemetry *Telemetry) *DeviceTelemetryData {
-	dataId := uuid.NewString()
 	return &DeviceTelemetryData{
-		Id:            dataId,
+		Id:            telemetry.ID,
 		DeviceId:      device.ID,
 		DeviceType:    device.DeviceType,
 		EnvType:       device.EnvType,

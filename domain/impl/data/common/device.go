@@ -1,6 +1,7 @@
 package common
 
 import (
+	"dominant/persistence/model"
 	"time"
 )
 
@@ -12,7 +13,6 @@ import (
 var deviceVideoLinkMap map[string]string
 
 type DeviceMessage interface {
-	ConvertToDevice(id string) *Device
 	ConvertToTelemetry(deviceId string) *Telemetry
 }
 
@@ -25,12 +25,12 @@ type Device struct {
 }
 
 type Telemetry struct {
-	ID            string    `json:"id"`            //id
-	DeviceID      string    `json:"deviceId"`      //设备id
-	TelemetryTime time.Time `json:"telemetryTime"` //遥测上传时间
-	Position      *Position `json:"position"`      //位置
-	Status        *Status   `json:"status"`        //状态
-	RawData       any       `json:"rawData"`       //原始数据
+	ID            string         `json:"id"`            //id
+	DeviceID      string         `json:"deviceId"`      //设备id
+	TelemetryTime time.Time      `json:"telemetryTime"` //遥测上传时间
+	Position      *Position      `json:"position"`      //位置
+	Status        *Status        `json:"status"`        //状态
+	RawData       *model.JsonObj `json:"rawData"`       //原始数据
 }
 
 type Position struct {
