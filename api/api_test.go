@@ -20,13 +20,13 @@ const (
 func TestDeviceMessage(t *testing.T) {
 	apiUrl := BaseUrl + UrlPrefix + "/telemetry/dataInfo"
 	hc := http_utils.NewHTTPClient()
-	res, _ := hc.SendRequest(
+	res, _ := hc.GetResponseData(
 		http_utils.NewHTTPRequest(
 			"GET",
 			apiUrl,
 			nil,
 			nil,
-			"",
-			nil))
+			nil,
+		))
 	t.Log(string(res))
 }
