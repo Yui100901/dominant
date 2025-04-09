@@ -1,7 +1,7 @@
 package monitor
 
 import (
-	"github.com/Yui100901/MyGo/concurrent"
+	"github.com/Yui100901/MyGo/concurrency"
 	"time"
 )
 
@@ -12,14 +12,14 @@ import (
 
 // Monitor 监视器，用于监测每个节点的状态
 type Monitor struct {
-	NodeMap    *concurrent.SafeMap[string, *Node] //节点map
+	NodeMap    *concurrency.SafeMap[string, *Node] //节点map
 	NodeIdChan chan string
 	CleanTime  time.Duration
 }
 
 func NewMonitor(cleanTime time.Duration) *Monitor {
 	return &Monitor{
-		NodeMap:    concurrent.NewSafeMap[string, *Node](32),
+		NodeMap:    concurrency.NewSafeMap[string, *Node](32),
 		NodeIdChan: make(chan string),
 		CleanTime:  cleanTime,
 	}
@@ -87,4 +87,12 @@ func (m *Monitor) GetOfflineNodes() []string {
 		return true
 	})
 	return offlineNodes
+}
+
+func (m *Monitor) GetOnlineStatusById(id string) bool {
+	node, ok := m.NodeMap.Get(id)
+	if !ok {
+		return false
+	}
+	return node.IsAlive
 }

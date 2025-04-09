@@ -19,3 +19,7 @@ func init() {
 func GetNodesList() ([]string, []string) {
 	return MainMonitor.GetOnlineNodes(), MainMonitor.GetOfflineNodes()
 }
+
+func GetNodeStatus(id string) bool {
+	return MainMonitor.GetOnlineStatusById(id)
+}
